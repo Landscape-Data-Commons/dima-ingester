@@ -4,13 +4,12 @@ import os
 import pandas as pd
 import logging
 
-
-class LPIHeader:
+class LPIDetail:
 
     def __init__(self, dimapath):
         self._dimapath = dimapath
-        self._table_name = "tblLPIHeader"
-        self._join_key = "LineKey"
+        self._table_name = "tblLPIDetail"
+        self._join_key = "RecKey"
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
         logging.info(f"Appending primary key to the {self._table_name}..")
@@ -24,7 +23,7 @@ class LPIHeader:
 
 
 
-class MultipleLPIHeaders:
+class MultipleLPIDetail:
 
     def __init__(self, dimadir):
         self.tables_dictionary = {f"list_{i}":Plots(os.path.join(dimadir,dimalist[i])).raw_table for i in range(0,len(dimalist))}

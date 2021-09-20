@@ -5,12 +5,18 @@ import pandas as pd
 import logging
 
 
-class LPIHeader:
+class GapHeader:
 
     def __init__(self, dimapath):
+        logging.info(f"Using this dima file: {dimapath}..")
         self._dimapath = dimapath
-        self._table_name = "tblLPIHeader"
+
+        self._table_name = "tblGapHeader"
+        logging.info(f"Processing this table: {self._table_name}..")
+
         self._join_key = "LineKey"
+        logging.info(f"Using this join key: {self._join_key}")
+
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
         logging.info(f"Appending primary key to the {self._table_name}..")
@@ -24,7 +30,7 @@ class LPIHeader:
 
 
 
-class MultipleLPIHeaders:
+class MultipleGapHeaders:
 
     def __init__(self, dimadir):
         self.tables_dictionary = {f"list_{i}":Plots(os.path.join(dimadir,dimalist[i])).raw_table for i in range(0,len(dimalist))}

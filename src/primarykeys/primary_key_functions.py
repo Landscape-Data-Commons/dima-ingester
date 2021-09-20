@@ -1,6 +1,8 @@
 from src.utils.database_functions import arcno
 import pandas as pd
 import re
+import logging
+
 """
 Primary key strategy:
 
@@ -12,10 +14,14 @@ Primary key strategy:
 
 """
 
+
+
 def pk_appender(dimapath, date_range):
     """ create header/detail dataframe with the new formdate,
     then return a dataframe with a primary key made from
     plotkey + formdate
+
+    works for plots, lines
     """
     arc = arcno()
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
@@ -23,9 +29,46 @@ def pk_appender(dimapath, date_range):
                        # dataframe with old formdate
     new_formdate_df = new_form_date(header_detail_df, date_range) # returns
                       # dataframe with new formdate range
-    final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "FormDatePK")
-    return final_df
 
+    # all big tables need plotkey, which comes from lines+plot join
+
+    line_plot = get_plotkeys(dimapath)
+    full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey")
+    if 'PlotKey_x' in full_join.columns:
+        full_join.drop(['PlotKey_x'], axis=1, inplace=True)
+        full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+    final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
+
+    return final_df.loc[:,["LineKey","RecKey","PlotKey", "PrimaryKey"]]
+
+def pk_appender_bsne(dimapath, date_range):
+    """ create header/detail dataframe with the new formdate,
+    then return a dataframe with a primary key made from
+    plotkey + collectdate
+
+    works for dustdepostion tables like bsne_box, tblBSNE_Stack, tblBSNE_BoxCollection
+    """
+    arc = arcno()
+    raw_bsne = dust_deposition_raw(dimapath)
+    new_formdate_df = new_form_date(raw_bsne, date_range)
+
+    if 'PlotKey_x' in new_formdate_df.columns:
+        new_formdate_df.drop(['PlotKey_x'], axis=1, inplace=True)
+        new_formdate_df.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+    final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "collectDatePK")
+
+    return final_df.loc[:,["BoxID","PlotKey", "PrimaryKey"]]
+
+def dust_deposition_raw(dimapath):
+    logging.info("Creating raw table from BSNE Box, Box Collection and Stack")
+    box = arcno.MakeTableView("tblBSNE_Box",dimapath)
+    stack = arcno.MakeTableView("tblBSNE_Stack", dimapath)
+    boxcol = arcno.MakeTableView('tblBSNE_BoxCollection', dimapath)
+
+    plotted_boxes = pd.merge(box,stack, how="inner", on="StackID")
+    collected_boxes = pd.merge(plotted_boxes,boxcol, how="inner", on="BoxID")
+    logging.info("raw bsne table done.")
+    return collected_boxes
 
 
 def form_date_check(dimapath):
@@ -59,26 +102,50 @@ def date_grp(target_date, formdate_df, date_spread):
     date_range inside the last class.
 
     """
-    lst = formdate_df.FormDate.unique()
-    date_range = pd.date_range(start=lst.min(), end=lst.max(), freq=f'{date_spread}D')
-    for i in range(0,len(date_range.tolist())):
-        if i < len(date_range)-1:
-            if target_date in pd.date_range(start=date_range[i], end=date_range[i+1]):
-                return date_range[i]
+    try:
+        logging.info("gathering dates from table..")
+        if "FormDate" in formdate_df.columns:
+            lst = formdate_df.FormDate.unique()
         else:
-            if target_date in pd.date_range(start=date_range[i], end=formdate_df.FormDate.max()):
-                return date_range[i]
+            lst = formdate_df.collectDate.unique()
+
+    except Exception as e:
+        logging.error(e)
+
+    finally:
+        date_range = pd.date_range(start=lst.min(), end=lst.max(), freq=f'{date_spread}D')
+        for i in range(0,len(date_range.tolist())):
+            if i < len(date_range)-1:
+                if target_date in pd.date_range(start=date_range[i], end=date_range[i+1]):
+                    return date_range[i]
+            else:
+                which_max=formdate_df.FormDate.max() if "FormDate" in formdate_df.columns else formdate_df.collectDate.max()
+                if target_date in pd.date_range(start=date_range[i], end=which_max):
+                    return date_range[i]
 
 def new_form_date(old_formdate_dataframe, custom_daterange):
     """ given a dataframe with a formdate field,
     returns a dataframe with a new formdate field with custom daterange classes
     for primarykey creation
     """
-    old_formdate_dataframe['FormDatePK'] = old_formdate_dataframe.apply(
-        lambda x: date_grp(x.FormDate, old_formdate_dataframe,custom_daterange),
-        axis=1
-    )
-    return old_formdate_dataframe
+    try:
+        logging.info("inferring field to apply custom daterange from dataframe..")
+        if "FormDate" in old_formdate_dataframe.columns:
+            which_field = 'FormDatePK'
+            which_field_original = 'FormDate'
+        elif "collectDate" in old_formdate_dataframe.columns:
+            which_field = 'collectDatePK'
+            which_field_original = 'collectDate'
+    except Exception as e:
+        logging.error("no usable daterange field found in dataframe!")
+    finally:
+
+        old_formdate_dataframe[which_field] = old_formdate_dataframe.apply(
+            lambda x: date_grp(x[which_field_original], old_formdate_dataframe,custom_daterange),
+            axis=1
+        )
+        logging.info("dataframe with custom daterange done.")
+        return old_formdate_dataframe
 
 def header_detail(formdate_dictionary, dimapath):
     """ create a header/detail dataframe with with a formdate dataframe
@@ -92,3 +159,11 @@ def header_detail(formdate_dictionary, dimapath):
             break
     df = pd.merge(header,detail, how="inner", on="RecKey")
     return df
+
+
+
+def get_plotkeys(dimapath):
+    line = arcno.MakeTableView("tblLines", dimapath)
+    plots = arcno.MakeTableView("tblPlots", dimapath)
+    line_plot = pd.merge(line, plots, how="inner", on="PlotKey")
+    return line_plot

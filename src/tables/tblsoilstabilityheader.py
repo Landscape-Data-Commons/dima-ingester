@@ -5,11 +5,10 @@ import pandas as pd
 import logging
 
 
-class LPIHeader:
-
+class SoilStabilityHeader:
     def __init__(self, dimapath):
         self._dimapath = dimapath
-        self._table_name = "tblLPIHeader"
+        self._table_name = "tblSoilStabilityHeader"
         self._join_key = "LineKey"
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
@@ -24,7 +23,7 @@ class LPIHeader:
 
 
 
-class MultipleLPIHeaders:
+class MultipleSoilStabilityHeader:
 
     def __init__(self, dimadir):
         self.tables_dictionary = {f"list_{i}":Plots(os.path.join(dimadir,dimalist[i])).raw_table for i in range(0,len(dimalist))}

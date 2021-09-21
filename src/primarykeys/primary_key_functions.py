@@ -61,6 +61,35 @@ def pk_appender_bsne(dimapath, date_range):
 
     return final_df.loc[:,array_to_return]
 
+def pk_appender_soil(dimapath, date_range):
+    """ create header/detail dataframe with the new formdate,
+    then return a dataframe with a primary key made from
+    plotkey + formdate
+
+    works for plots, lines
+    """
+    arc = arcno() # to use calculatefield and get primarykey
+
+    soilpk = soil_pits_raw(dimapath)
+    tables_with_formdate = form_date_check(dimapath) # returns dictionary
+    header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
+                       # dataframe with old formdate
+    new_formdate_df = new_form_date(header_detail_df, date_range) # returns
+                      # dataframe with new formdate range
+
+    full_join = pd.merge(new_formdate_df, soilpk, how="inner", on="PlotKey")
+    if 'PlotKey_x' in full_join.columns:
+        full_join.drop(['PlotKey_x'], axis=1, inplace=True)
+        full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+    final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
+
+    return final_df.loc[:,["HorizonKey","PlotKey", "PrimaryKey"]]
+
+def soil_pits_raw(dimapath):
+    logging.info("Creating raw table from soilpits and soilpithorizons..")
+    horizons = arcno.MakeTableView("tblSoilPitHorizons",dimapath)
+    pits = arcno.MakeTableView("tblSoilPits", dimapath)
+    return pd.merge(pits,horizons, how="inner", on="SoilKey")
 
 def dust_deposition_raw(dimapath):
     logging.info("Creating raw table from BSNE Box, Box Collection and Stack")

@@ -7,8 +7,9 @@ from src.tables.tblgapdetail import GapDetail
 from src.tables.tblsoilstabilityheader import SoilStabilityHeader
 from src.tables.tblsoilstabilitydetail import SoilStabilityDetail
 from src.tables.tbldustdeposition import DustDeposition
+from src.tables.tblhorizontalflux import HorizontalFlux
 
 __all__ = ["Lines", "MultipleLines", "Plots", "MultiplePlots",
 "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
-"SoilStabilityDetail", "DustDeposition"
+"SoilStabilityDetail", "DustDeposition", "HorizontalFlux"
 ]

@@ -48,8 +48,10 @@ def pk_appender_bsne(dimapath, date_range):
 
     works for dustdepostion tables like bsne_box, tblBSNE_Stack, tblBSNE_BoxCollection
     """
-    arc = arcno()
-    raw_bsne = dust_deposition_raw(dimapath)
+    arc = arcno(dimapath)
+    array_to_return = ["StackID","PlotKey", "PrimaryKey"] if "tblBSNE_TrapCollection" in arc.actual_list else ["BoxID","PlotKey", "PrimaryKey"]
+    raw_bsne = horizontalflux_raw(dimapath) if "tblBSNE_TrapCollection" in arc.actual_list else dust_deposition_raw(dimapath)
+    # raw_bsne = dust_deposition_raw(dimapath)
     new_formdate_df = new_form_date(raw_bsne, date_range)
 
     if 'PlotKey_x' in new_formdate_df.columns:
@@ -57,7 +59,8 @@ def pk_appender_bsne(dimapath, date_range):
         new_formdate_df.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
     final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "collectDatePK")
 
-    return final_df.loc[:,["BoxID","PlotKey", "PrimaryKey"]]
+    return final_df.loc[:,array_to_return]
+
 
 def dust_deposition_raw(dimapath):
     logging.info("Creating raw table from BSNE Box, Box Collection and Stack")
@@ -69,6 +72,14 @@ def dust_deposition_raw(dimapath):
     collected_boxes = pd.merge(plotted_boxes,boxcol, how="inner", on="BoxID")
     logging.info("raw bsne table done.")
     return collected_boxes
+
+def horizontalflux_raw(dimapath):
+    logging.info("Creating raw table from BSNE tblBSNE_TrapCollection and Stack")
+    ddt = arcno.MakeTableView("tblBSNE_TrapCollection",dimapath)
+    stack = arcno.MakeTableView("tblBSNE_Stack", dimapath)
+    df = pd.merge(stack,ddt, how="inner", on="StackID")
+    logging.info("raw bsne table done.")
+    return df
 
 
 def form_date_check(dimapath):

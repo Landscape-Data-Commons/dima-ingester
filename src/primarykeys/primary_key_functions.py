@@ -142,8 +142,9 @@ def date_grp(target_date, formdate_df, date_spread):
     date_range inside the last class.
 
     """
+    # logging.info("gathering dates from table..")
     try:
-        logging.info("gathering dates from table..")
+
         if "FormDate" in formdate_df.columns:
             lst = formdate_df.FormDate.unique()
         else:
@@ -168,8 +169,9 @@ def new_form_date(old_formdate_dataframe, custom_daterange):
     returns a dataframe with a new formdate field with custom daterange classes
     for primarykey creation
     """
+    logging.info("inferring field to apply custom daterange from dataframe..")
+
     try:
-        logging.info("inferring field to apply custom daterange from dataframe..")
         if "FormDate" in old_formdate_dataframe.columns:
             which_field = 'FormDatePK'
             which_field_original = 'FormDate'

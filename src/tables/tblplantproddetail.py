@@ -1,12 +1,13 @@
 from src.utils.database_functions import arcno
-from src.primarykeys.primary_key_functions import pk_appender_soil
+from src.primarykeys.primary_key_functions import pk_appender, get_plotkeys
 import os
 import pandas as pd
 import logging
 
-class SoilPitHorizons:
-    _table_name = "tblSoilPits"
-    _join_key = "PlotKey"
+
+class PlantProdDetail:
+    _table_name = "tblPlantProdDetail"
+    _join_key = "RecKey"
     
     def __init__(self, dimapath):
         self._dimapath = dimapath
@@ -19,7 +20,8 @@ class SoilPitHorizons:
 
     def get_pk(self, custom_daterange):
         # primary key flow
-        self.pk_source = pk_appender_soil(self._dimapath, custom_daterange)
+        self.pk_source = pk_appender(self._dimapath, custom_daterange)
+
         return pd.merge(self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']], how="inner", on=self._join_key)
 
     def tbl_fixes(self, df):

@@ -1,5 +1,5 @@
-from src.tables.tbllines import Lines, MultipleLines
-from src.tables.tblplots import Plots, MultiplePlots
+from src.tables.tbllines import Lines
+from src.tables.tblplots import Plots
 from src.tables.tbllpiheader import LPIHeader
 from src.tables.tbllpidetail import LPIDetail
 from src.tables.tblgapheader import GapHeader
@@ -11,9 +11,13 @@ from src.tables.tblhorizontalflux import HorizontalFlux
 from src.tables.tblsoilpits import SoilPits
 from src.tables.tblsoilpithorizons import SoilPitHorizons
 from src.tables.tblsites import Sites
+from src.tables.tblspecies import Species
+from src.tables.tblspeciesgeneric import SpeciesGeneric
+from src.tables.tblplantprodheader import PlantProdHeader
+from src.tables.tblplantproddetail import PlantProdDetail
 
-__all__ = ["Lines", "MultipleLines", "Plots", "MultiplePlots",
-"LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
+__all__ = ["Lines", "Plots", "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
 "SoilStabilityDetail", "DustDeposition", "HorizontalFlux", "SoilPits",
-"SoilPitHorizons", "Sites"
+"SoilPitHorizons", "Sites", "Species", "SpeciesGeneric", "PlantProdHeader",
+"PlantProdDetail"
 ]

@@ -2,16 +2,20 @@ from src.utils.database_functions import arcno
 # from src.primarykeys.primary_key_functions import pk_appender
 import os
 import pandas as pd
+import logging
 
 
 class Sites:
+    _table_name = "tblSites"
+    _join_key = "PlotKey"
 
     def __init__(self, dimapath):
         self._dimapath = dimapath
-        self._table_name = "tblSites"
-        self._join_key = "PlotKey"
+        logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
+        logging.info(f"Appending primary key to the {self._table_name}..")
         self.table_pk = self.removables(self.raw_table)
+        self.final_df = self.tbl_fixes(self.table_pk)
 
     def removables(self, df):
         if "SiteKey" in self.raw_table.columns:
@@ -20,12 +24,5 @@ class Sites:
             else:
                 return df
 
-
-class MultipleSites:
-
-    def __init__(self, dimadir):
-        self.tables_dictionary = {f"list_{i}":PlotNotes(os.path.join(dimadir,dimalist[i])).raw_table for i in range(0,len(dimalist))}
-        self.raw_tables = pd.concat([j for i,j in self.tables_dictionary.items()],ignore_index=True)
-
-        # self.tables_dictionary_pk = {f"list_{i}":PlotNotes(os.path.join(dimadir,dimalist[i])).table_pk for i in range(0,len(dimalist))}
-        # self.raw_table_pk = pd.concat([j for i,j in self.tables_dictionary_pk.items()],ignore_index=True)
+    def tbl_fixes(self, df):
+        return df

@@ -3,3 +3,6 @@ pseudocode.py
 
 **/__init__.cpython-38.py 
 **/__pycache__
+**/*.mdb
+**/*.ldb
+**/*.accdb

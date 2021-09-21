@@ -10,9 +10,10 @@ from src.tables.tbldustdeposition import DustDeposition
 from src.tables.tblhorizontalflux import HorizontalFlux
 from src.tables.tblsoilpits import SoilPits
 from src.tables.tblsoilpithorizons import SoilPitHorizons
+from src.tables.tblsites import Sites
 
 __all__ = ["Lines", "MultipleLines", "Plots", "MultiplePlots",
 "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
 "SoilStabilityDetail", "DustDeposition", "HorizontalFlux", "SoilPits",
-"SoilPitHorizons"
+"SoilPitHorizons", "Sites"
 ]

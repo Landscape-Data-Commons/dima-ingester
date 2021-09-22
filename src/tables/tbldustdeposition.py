@@ -6,9 +6,9 @@ import pandas as pd
 import logging
 
 class DustDeposition:
-    _join_key = "BoxID"
     _table_name = "tblDustDeposition"
-    
+    _join_key = "StackID"
+
     def __init__(self, dimapath):
         self._dimapath = dimapath
         logging.info(f"Extracting the {self._table_name} from the dimafile..")

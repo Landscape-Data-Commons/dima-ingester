@@ -8,7 +8,7 @@ import logging
 class GapHeader:
     _table_name = "tblGapHeader"
     _join_key = "LineKey"
-    
+
     def __init__(self, dimapath):
         self._dimapath = dimapath
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
@@ -24,4 +24,24 @@ class GapHeader:
         return pd.merge(self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']], how="inner", on=self._join_key)
 
     def tbl_fixes(self, df):
+        df = alt_gapheader_check(df)
         return df
+
+def alt_gapheader_check(dataframe):
+    for i in dataframe.columns:
+        if "PerennialsCanopy" in i:
+            return dataframe
+        elif "Perennials" in i:
+            df = dataframe.copy()
+            df.rename(columns={
+                "Perennials":"PerennialsCanopy",
+                "AnnualGrasses":"AnnualGrassesCanopy",
+                "AnnualForbs":"AnnualForbsCanopy",
+                "Other":"OtherCanopy"},
+                inplace=True)
+            df["PerennialsBasal"] = pd.NA
+            df["AnnualGrassesBasal"] = pd.NA
+            df["AnnualForbsBasal"] = pd.NA
+            df["OtherBasal"] = pd.NA
+
+            return df

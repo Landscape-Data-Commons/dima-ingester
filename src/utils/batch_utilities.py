@@ -1,4 +1,6 @@
 import os
+import pandas as pd
+from datetime import datetime
 from src.utils.database_functions import arcno
 import logging
 logging.basicConfig(format='%(asctime)s | %(levelname)s: %(message)s', level=logging.NOTSET)
@@ -14,6 +16,14 @@ from src.tables import (
 
 
 def table_operations(tablename, dimapath):
+    """ handles which table-creating functions to call
+    depending on which tablename you supply as argument.
+
+    logic behind this is to make building composite tables
+    which dont exist in dimas (such as dustdeposition and horizontal flux),
+    while not considering their source tables (like bsne_box etc.) which
+    are not to be ingested as they are.
+    """
     table_handling = {
         # single tables with primarykey
         "tblLines":{
@@ -59,11 +69,11 @@ def table_operations(tablename, dimapath):
             "operation": lambda: SoilPitHorizons(dimapath).final_df
         },
         "tblBSNE_TrapCollection":{
-            "db_name":"tblHorizontalFlux",
+            "db_name":"tblDustDeposition",
             "operation": lambda: DustDeposition(dimapath).final_df
         },
         "tblBSNE_BoxCollection":{
-            "db_name":"tblDustDeposition",
+            "db_name":"tblhorizontalflux",
             "operation": lambda: HorizontalFlux(dimapath).final_df
         },
         "tblGapHeader":{
@@ -106,48 +116,38 @@ def looper(path2mdbs, tablename, projk=None, csv=False):
             countup = basestring+str(count)
             # df creation/manipulation starts here
             arc = arcno(os.path.join(containing_folder,i))
-            print(i)
-            # df = main_translate(tablename, os.path.join(containing_folder,i))
-            df = table_operations(tablename, os.path.join(containing_folder,i))['operation']()
-            # if its gapheader, this deals with different versions (the fun alt_gapheader_check)
-            # if "tblGapHeader" in tablename:
-            #     if tablename in arc.actual_list:
-            #         df = alt_gapheader_check(df)
-            #     else:
-            #         df = None
-            #
-            # if df is not None:
-            #     if 'DateLoadedInDB' in df.columns:
-            #         df['DateLoadedInDB']=df['DateLoadedInDB'].astype('datetime64')
-            #         df['DateLoadedInDB'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-            #     else:
-            #         df['DateLoadedInDB'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-            #
-            #     df['DBKey'] = os.path.split(os.path.splitext(i)[0])[1].replace(" ","")
-            #     # df add to dictionary list
-            #     df_dictionary[countup] = df.copy()
-
-            else:
+            if tablename not in arc.actual_list:
                 pass
+            else:
+                df = table_operations(tablename, os.path.join(containing_folder,i))['operation']()
+                if df is not None:
+                    df = dateloaded_dbkey(df, i)
+                    df_dictionary[countup] = df.copy()
+                else:
+                    pass
             count+=1
     # return df_dictionary
     if len(df_dictionary)>0:
         final_df = pd.concat([j for i,j in df_dictionary.items()], ignore_index=True).drop_duplicates()
-        final_df = dateloadedcheck(final_df)
-        # final_df = northing_round(final_df)
 
         if (tablename == 'tblPlots') and (projk is not None) :
             final_df["ProjectKey"] = projk
-        if "tblLines" in tablename:
-            for i in final_df.columns:
-                if "PrimaryKey" in i:
-                    final_df[i] = final_df[i].astype("object")
-
 
         return final_df if csv==False else final_df.to_csv(os.path.join(containing_folder,tablename+'.csv'))
     else:
-        print(f"table '{tablename}' not found within this dima batch")
+        logging.info(f"table '{tablename}' not found within this dima batch")
 
+def dateloaded_dbkey(df, filename):
+    """ appends DateLoadedInDB and dbkey to the dataframe
+    """
+    if 'DateLoadedInDB' in df.columns:
+        df['DateLoadedInDB'] = df['DateLoadedInDB'].astype('datetime64')
+        df['DateLoadedInDB'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    else:
+        df['DateLoadedInDB'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
+    df['DBKey'] = os.path.split(os.path.splitext(filename)[0])[1].replace(" ","")
+    return df
 
 
 def table_collector(path2mdbs):

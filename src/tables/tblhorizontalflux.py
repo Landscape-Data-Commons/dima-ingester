@@ -7,7 +7,7 @@ import logging
 
 class HorizontalFlux:
     _table_name = "tblHorizontalFlux"
-    _join_key = "StackID"
+    _join_key = "BoxID"
 
     def __init__(self, dimapath):
         self._dimapath = dimapath

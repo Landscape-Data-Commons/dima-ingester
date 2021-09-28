@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime
 from src.utils.database_functions import arcno, db
 from src.utils.utility_functions import tablecheck, table_create
+from src.utils.ingester import Ingester 
 import logging
 
 logging.basicConfig(format='%(asctime)s | %(levelname)s: %(message)s', level=logging.NOTSET)

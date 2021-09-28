@@ -1,19 +1,19 @@
 import os
 import pandas as pd
 from datetime import datetime
-from src.utils.database_functions import arcno
+from src.utils.database_functions import arcno, db
+from src.utils.utility_functions import tablecheck, table_create
 import logging
-logging.basicConfig(format='%(asctime)s | %(levelname)s: %(message)s', level=logging.NOTSET)
 
+logging.basicConfig(format='%(asctime)s | %(levelname)s: %(message)s', level=logging.NOTSET)
 
 from src.tables import (
     Lines, Plots, LPIHeader, LPIDetail, GapDetail, GapHeader,
     SoilStabilityHeader, SoilStabilityDetail,
     DustDeposition, HorizontalFlux, SoilPits,
     SoilPitHorizons, Sites, Species, SpeciesGeneric,
-    PlantProdHeader, PlantProdDetail
+    PlantProdHeader, PlantProdDetail, PlotHistory
     )
-
 
 def table_operations(tablename, dimapath):
     """ handles which table-creating functions to call
@@ -92,11 +92,14 @@ def table_operations(tablename, dimapath):
             "db_name": "tblLPIDetail",
             "operation": lambda: LPIDetail(dimapath).final_df
         },
+        "tblPlotHistory":{
+            "db_name": "tblPlotHistory",
+            "operation": lambda: PlotHistory(dimapath).final_df
+        },
     }
     return table_handling.get(tablename)
 
-
-def looper(path2mdbs, tablename, projk=None, csv=False):
+def looper(path2mdbs, tablename, projk=None):
     """
     goes through all the files(.mdb or .accdb extensions) inside a folder,
     create a dataframe of the chosen table using the 'main_translate' function,
@@ -117,25 +120,69 @@ def looper(path2mdbs, tablename, projk=None, csv=False):
             # df creation/manipulation starts here
             arc = arcno(os.path.join(containing_folder,i))
             if tablename not in arc.actual_list:
-                pass
+                logging.info(f"table {tablename} not found within '{i}'")
             else:
+                tbl = table_operations(tablename, os.path.join(containing_folder,i))['db_name']
                 df = table_operations(tablename, os.path.join(containing_folder,i))['operation']()
-                if df is not None:
-                    df = dateloaded_dbkey(df, i)
-                    df_dictionary[countup] = df.copy()
+                df = dateloaded_dbkey(df, i)
+
+                if df.size>0:
+                    df_dictionary[countup] = df
                 else:
-                    pass
-            count+=1
+                    df_dictionary[countup] = None
+                count+=1
+
     # return df_dictionary
     if len(df_dictionary)>0:
-        final_df = pd.concat([j for i,j in df_dictionary.items()], ignore_index=True).drop_duplicates()
+        final_df = pd.concat([j for i,j in df_dictionary.items()], ignore_index=True).drop_duplicates().reset_index(drop=True)
 
         if (tablename == 'tblPlots') and (projk is not None) :
             final_df["ProjectKey"] = projk
+        obj = {
+            'db_name':tbl,
+            'dataframe':final_df
+        }
 
-        return final_df if csv==False else final_df.to_csv(os.path.join(containing_folder,tablename+'.csv'))
+        return obj
     else:
         logging.info(f"table '{tablename}' not found within this dima batch")
+
+def batch_looper(dimacontainer, dev=False):
+
+    """
+    addition
+    creates an exhaustive list of tables across all dimas in a folder
+    and then uses looper to gothrough the list of tables and create csv's for
+    each.
+    """
+    if dev==False:
+        d = db('dima')
+        keyword = "dima"
+    else:
+        d = db("dimadev")
+        keyword = "dimadev"
+
+    tablelist = None
+    while tablelist is None:
+        tablelist = table_collector(dimacontainer)
+        logging.info(f"list of tables across current dimafiles: {[i for i in tablelist]}")
+    else:
+        for table in tablelist:
+            obj = looper(dimacontainer,table) if 'tblPlots' not in table else looper(dimacontainer,table, projkey)
+            df = obj['dataframe']
+            if tablecheck(obj['db_name'], keyword):
+                logging.info(f"table '{table}' found; ingesting..")
+
+                # ingesterv2.main_ingest(df, obj['db_name'], d.str, 10000)
+                logging.info("INGESTING 1")
+            else:
+                logging.info(f"table '{table}' not found; creating table and ingesting..")
+                # table_create(df, obj['db_name'], keyword)
+
+                # ingesterv2.main_ingest(df, obj['db_name'], d.str, 10000)
+                logging.info("INGESTING 2")
+
+
 
 def dateloaded_dbkey(df, filename):
     """ appends DateLoadedInDB and dbkey to the dataframe

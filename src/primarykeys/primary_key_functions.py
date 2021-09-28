@@ -16,7 +16,7 @@ Primary key strategy:
 
 
 
-def pk_appender(dimapath, date_range):
+def pk_appender(dimapath, date_range, tablename = None):
     """ create header/detail dataframe with the new formdate,
     then return a dataframe with a primary key made from
     plotkey + formdate
@@ -25,21 +25,43 @@ def pk_appender(dimapath, date_range):
     """
     arc = arcno()
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
-    header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
-                       # dataframe with old formdate
-    new_formdate_df = new_form_date(header_detail_df, date_range) # returns
-                      # dataframe with new formdate range
 
-    # all big tables need plotkey, which comes from lines+plot join
+    #
+    if tablename is not None:
+        tables_with_formdate= formdate_correction(tables_with_formdate, tablename)
 
-    line_plot = get_plotkeys(dimapath)
-    full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey")
-    if 'PlotKey_x' in full_join.columns:
-        full_join.drop(['PlotKey_x'], axis=1, inplace=True)
-        full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
-    final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
+    if any(tables_with_formdate.values()):
 
-    return final_df.loc[:,["LineKey","RecKey","PlotKey", "PrimaryKey"]]
+        header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
+                           # dataframe with old formdate
+        new_formdate_df = new_form_date(header_detail_df, date_range) # returns
+                          # dataframe with new formdate range
+
+        # all big tables need plotkey, which comes from lines+plot join
+
+        line_plot = get_plotkeys(dimapath)
+        full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey")
+        if 'PlotKey_x' in full_join.columns:
+            full_join.drop(['PlotKey_x'], axis=1, inplace=True)
+            full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+        final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
+
+        return final_df.loc[:,["LineKey","RecKey","PlotKey", "PrimaryKey"]]
+    else:
+        pass
+
+def formdate_correction(obj, tablename):
+    obj_copy = obj.copy()
+    st = f"{tablename}".split('Detail')[0]
+    for i in obj_copy.keys():
+        if obj_copy[i] is True:
+            if st in i:
+                obj_copy[i] = True
+            else:
+                obj_copy[i] = False
+        else:
+            pass
+    return obj_copy
 
 def pk_appender_bsne(dimapath, date_range):
     """ create header/detail dataframe with the new formdate,
@@ -202,7 +224,7 @@ def header_detail(formdate_dictionary, dimapath):
             df = pd.merge(header,detail, how="inner", on="RecKey")
             return df
         else:
-            return pd.DataFrame()
+            pass
 
 
 

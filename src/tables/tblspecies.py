@@ -12,7 +12,7 @@ class Species:
         self._dimapath = dimapath
 
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
-        self.final_df = self.tbl_fixes(self.raw_table)
+        self.final_df = self.tbl_fixes(self.raw_table).drop_duplicates()
 
     def tbl_fixes(self, df):
         return df

@@ -5,8 +5,8 @@ import pandas as pd
 import logging
 
 
-class SpeciesGeneric:
-    _table_name = "tblSpeciesGeneric"
+class PlotHistory:
+    _table_name = "tblPlotHistory"
 
     def __init__(self, dimapath):
         self._dimapath = dimapath

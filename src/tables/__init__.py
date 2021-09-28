@@ -15,9 +15,10 @@ from src.tables.tblspecies import Species
 from src.tables.tblspeciesgeneric import SpeciesGeneric
 from src.tables.tblplantprodheader import PlantProdHeader
 from src.tables.tblplantproddetail import PlantProdDetail
+from src.tables.tblplothistory import PlotHistory
 
 __all__ = ["Lines", "Plots", "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
 "SoilStabilityDetail", "DustDeposition", "HorizontalFlux", "SoilPits",
 "SoilPitHorizons", "Sites", "Species", "SpeciesGeneric", "PlantProdHeader",
-"PlantProdDetail"
+"PlantProdDetail", "PlotHistory"
 ]

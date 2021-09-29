@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  pyalpine:
+  ingester:
     build:
       context: . 
       dockerfile: src/Dockerfile
@@ -10,4 +10,5 @@ services:
     container_name: pyalpine
     volumes:
       - ./dimas:/usr/src/dimas:cached
-# docker-compose run --rm myalpine
+# docker-compose build
+# docker-compose run --rm ingester

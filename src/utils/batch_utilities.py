@@ -155,8 +155,7 @@ def batch_looper(dimacontainer, projkey=None, dev=False, pk_formdate_range=None)
     """
     addition
     creates an exhaustive list of tables across all dimas in a folder
-    and then uses looper to gothrough the list of tables and create csv's for
-    each.
+    and then uses looper to gothrough the list of tables and ingest them
     """
     if dev==False:
         d = db('dima')
@@ -177,14 +176,12 @@ def batch_looper(dimacontainer, projkey=None, dev=False, pk_formdate_range=None)
             if tablecheck(obj['db_name'], keyword):
                 logging.info(f"table '{table}' found; ingesting..")
 
-                # ingesterv2.main_ingest(df, obj['db_name'], d.str, 10000)
-                logging.info("INGESTING 1")
+                Ingester.main_ingest(df, obj['db_name'], d.str, 10000)
             else:
                 logging.info(f"table '{table}' not found; creating table and ingesting..")
-                # table_create(df, obj['db_name'], keyword)
+                table_create(df, obj['db_name'], keyword)
 
-                # ingesterv2.main_ingest(df, obj['db_name'], d.str, 10000)
-                logging.info("INGESTING 2")
+                Ingester.main_ingest(df, obj['db_name'], d.str, 10000)
 
 
 

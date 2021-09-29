@@ -9,27 +9,7 @@ from src.utils.tablefields import tablefields
 """
 utility functions
 
-1. new_tablename : Returns tblHorizontalFlux or tblDustDeposition, depending
-on the contents of the ItemType field
-
-2. fix_fields:
-
-3
 """
-
-def new_tablename(df:pd.DataFrame):
-    """
-    if dataframe has an 'ItemType' field,
-    return a new tablename string depending on what's present in that field.
-    """
-    if 'ItemType' in df.columns:
-        if (any(df.ItemType=='M')) or (any(df.ItemType=='m')):
-            newtablename = 'tblHorizontalFlux'
-            return newtablename
-
-        elif (any(df.ItemType=='T')) or (any(df.ItemType=='t')):
-            newtablename = 'tblDustDeposition'
-            return newtablename
 
 def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
     """
@@ -72,24 +52,6 @@ def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
         con = d.str
         cur = con.cursor()
 
-def alt_gapheader_check(dataframe):
-    for i in dataframe.columns:
-        if "PerennialsCanopy" in i:
-            return dataframe
-        elif "Perennials" in i:
-            df = dataframe.copy()
-            df.rename(columns={
-                "Perennials":"PerennialsCanopy",
-                "AnnualGrasses":"AnnualGrassesCanopy",
-                "AnnualForbs":"AnnualForbsCanopy",
-                "Other":"OtherCanopy"},
-                inplace=True)
-            df["PerennialsBasal"] = pd.NA
-            df["AnnualGrassesBasal"] = pd.NA
-            df["AnnualForbsBasal"] = pd.NA
-            df["OtherBasal"] = pd.NA
-
-            return df
 
 def table_fields(df, tablename):
     table_fields = {}

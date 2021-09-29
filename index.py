@@ -16,8 +16,9 @@ class main(Cmd):
         self.prompt = "> "
         self.batch_path = os.path.normpath(os.path.join(os.getcwd(),"dimas"))
         self.dimafiles = [os.path.normpath(f"{self.batch_path}/{i}") for i in os.listdir(self.batch_path)]
+
     def do_pgtables(self, args):
-        """tables in dima database or dev database
+        """tables currently in dima database or dev database
         """
         if args == "dima":
             dimalst = all_dimas("dima")
@@ -30,23 +31,20 @@ class main(Cmd):
             print(devlst)
 
         else:
-            print("unknoun command")
-
-        # name, cost = args.rsplit(" ", 1)
+            print(f"database '{args}' not yet implemented.")
 
     def do_ingest(self,args):
-        """ ingest projectkey pk_formdate_range development
+        """ ingest all tables contained across all the dimas inside the dima
+        directory. submit arguments to function separated by spaces
+        argument order: ProjectKey( string ) PrimaryKey Date Range (integer) DevelopmentDB (boolean)
+        example usage:
+        "ingest test_project 3 True"
+        For this ingestion cycle, use test_project as project key, create primarykey
+        with form date divided into 3 day classes, and ingest to development database.
+
         """
         projectkey, pk_formdate_range, dev_or_not = args.split(" ", 3)
-        print(f"with project key: {projectkey}.")
-        print(f"with primary key formdate range of {pk_formdate_range} days.")
-        print(f"ingest to development db? (True/False): {dev_or_not}")
-        print(self.batch_path)
-        # print(Lines(self.dimafiles[1],3).final_df.iloc[:5,:])
-        # print(table_operations("tblLines", self.dimafiles[0], 3)['db_name'] )
-        # print(looper(self.batch_path, "tblLines", "test", 3))
-        # print(table_operations("tblLines", self.dimafiles[0], 3)['operation']() )
-        # print(projectkey, pk_formdate_range, dev_or_not)
+
         batch_looper(self.batch_path, projectkey, dev_or_not, pk_formdate_range)
 
     def do_exit(self, args):
@@ -54,4 +52,4 @@ class main(Cmd):
 
 if __name__=="__main__":
     app = main()
-    app.cmdloop("Enter something")
+    app.cmdloop("Currently available commands: pgtables, ingest, exit, help.")

@@ -9,7 +9,7 @@ class GapHeader:
     _table_name = "tblGapHeader"
     _join_key = "LineKey"
 
-    def __init__(self, dimapath):
+    def __init__(self, dimapath, pk_formdate_range):
         self._dimapath = dimapath
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)

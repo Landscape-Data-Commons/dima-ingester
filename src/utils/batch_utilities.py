@@ -3,10 +3,8 @@ import pandas as pd
 from datetime import datetime
 from src.utils.database_functions import arcno, db
 from src.utils.utility_functions import tablecheck, table_create
-from src.utils.ingester import Ingester 
+from src.utils.ingester import Ingester
 import logging
-
-logging.basicConfig(format='%(asctime)s | %(levelname)s: %(message)s', level=logging.NOTSET)
 
 from src.tables import (
     Lines, Plots, LPIHeader, LPIDetail, GapDetail, GapHeader,
@@ -16,7 +14,7 @@ from src.tables import (
     PlantProdHeader, PlantProdDetail, PlotHistory
     )
 
-def table_operations(tablename, dimapath):
+def table_operations(tablename, dimapath, pk_formdate_range):
     """ handles which table-creating functions to call
     depending on which tablename you supply as argument.
 
@@ -25,15 +23,16 @@ def table_operations(tablename, dimapath):
     while not considering their source tables (like bsne_box etc.) which
     are not to be ingested as they are.
     """
+    pk_formdate_range = int(pk_formdate_range)
     table_handling = {
         # single tables with primarykey
         "tblLines":{
             "db_name":"tblLines",
-            "operation": lambda: Lines(dimapath).final_df
+            "operation": lambda: Lines(dimapath, pk_formdate_range).final_df
         },
         "tblPlots":{
             "db_name":"tblPlots",
-            "operation": lambda: Plots(dimapath).final_df
+            "operation": lambda: Plots(dimapath, pk_formdate_range).final_df
         },
         # no primarykey
         "tblSites":{
@@ -55,43 +54,43 @@ def table_operations(tablename, dimapath):
         # more complex primarykey tables
         "tblPlantProdHeader":{
             "db_name":"tblPlantProdHeader",
-            "operation": lambda: PlantProdHeader(dimapath).final_df
+            "operation": lambda: PlantProdHeader(dimapath, pk_formdate_range).final_df
         },
         "tblPlantProdDetail":{
             "db_name":"tblPlantProdDetail",
-            "operation": lambda: PlantProdDetail(dimapath).final_df
+            "operation": lambda: PlantProdDetail(dimapath, pk_formdate_range).final_df
         },
         "tblSoilPits":{
             "db_name":"tblSoilPits",
-            "operation": lambda: SoilPits(dimapath).final_df
+            "operation": lambda: SoilPits(dimapath, pk_formdate_range).final_df
         },
         "tblSoilPitHorizons":{
             "db_name":"tblSoilPitHorizons",
-            "operation": lambda: SoilPitHorizons(dimapath).final_df
+            "operation": lambda: SoilPitHorizons(dimapath, pk_formdate_range).final_df
         },
         "tblBSNE_TrapCollection":{
             "db_name":"tblDustDeposition",
-            "operation": lambda: DustDeposition(dimapath).final_df
+            "operation": lambda: DustDeposition(dimapath, pk_formdate_range).final_df
         },
         "tblBSNE_BoxCollection":{
             "db_name":"tblhorizontalflux",
-            "operation": lambda: HorizontalFlux(dimapath).final_df
+            "operation": lambda: HorizontalFlux(dimapath, pk_formdate_range).final_df
         },
         "tblGapHeader":{
             "db_name": "tblGapHeader",
-            "operation": lambda: GapHeader(dimapath).final_df
+            "operation": lambda: GapHeader(dimapath, pk_formdate_range).final_df
         },
         "tblGapDetail":{
             "db_name": "tblGapDetail",
-            "operation": lambda: GapDetail(dimapath).final_df
+            "operation": lambda: GapDetail(dimapath, pk_formdate_range).final_df
         },
         "tblLPIHeader":{
             "db_name": "tblLPIHeader",
-            "operation": lambda:LPIHeader(dimapath).final_df
+            "operation": lambda:LPIHeader(dimapath, pk_formdate_range).final_df
         },
         "tblLPIDetail":{
             "db_name": "tblLPIDetail",
-            "operation": lambda: LPIDetail(dimapath).final_df
+            "operation": lambda: LPIDetail(dimapath, pk_formdate_range).final_df
         },
         "tblPlotHistory":{
             "db_name": "tblPlotHistory",
@@ -100,7 +99,7 @@ def table_operations(tablename, dimapath):
     }
     return table_handling.get(tablename)
 
-def looper(path2mdbs, tablename, projk=None):
+def looper(path2mdbs, tablename, projk=None, pk_formdate_range=None):
     """
     goes through all the files(.mdb or .accdb extensions) inside a folder,
     create a dataframe of the chosen table using the 'main_translate' function,
@@ -108,6 +107,9 @@ def looper(path2mdbs, tablename, projk=None):
     finally appends all the dataframes
     and returns the entire appended dataframe
     """
+    # if pk_formdate_range is not None:
+    #     pk_formdate_range = int(pk_formdate_range)
+
     containing_folder = path2mdbs
     contained_files = os.listdir(containing_folder)
     df_dictionary={}
@@ -123,8 +125,8 @@ def looper(path2mdbs, tablename, projk=None):
             if tablename not in arc.actual_list:
                 logging.info(f"table {tablename} not found within '{i}'")
             else:
-                tbl = table_operations(tablename, os.path.join(containing_folder,i))['db_name']
-                df = table_operations(tablename, os.path.join(containing_folder,i))['operation']()
+                tbl = table_operations(tablename, os.path.join(containing_folder,i), pk_formdate_range)['db_name']
+                df = table_operations(tablename, os.path.join(containing_folder,i), pk_formdate_range)['operation']()
                 df = dateloaded_dbkey(df, i)
 
                 if df.size>0:
@@ -148,7 +150,7 @@ def looper(path2mdbs, tablename, projk=None):
     else:
         logging.info(f"table '{tablename}' not found within this dima batch")
 
-def batch_looper(dimacontainer, dev=False):
+def batch_looper(dimacontainer, projkey=None, dev=False, pk_formdate_range=None):
 
     """
     addition
@@ -169,7 +171,8 @@ def batch_looper(dimacontainer, dev=False):
         logging.info(f"list of tables across current dimafiles: {[i for i in tablelist]}")
     else:
         for table in tablelist:
-            obj = looper(dimacontainer,table) if 'tblPlots' not in table else looper(dimacontainer,table, projkey)
+
+            obj = looper(dimacontainer,table, projkey, pk_formdate_range)
             df = obj['dataframe']
             if tablecheck(obj['db_name'], keyword):
                 logging.info(f"table '{table}' found; ingesting..")

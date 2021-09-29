@@ -206,7 +206,7 @@ def new_form_date(old_formdate_dataframe, custom_daterange):
     finally:
 
         old_formdate_dataframe[which_field] = old_formdate_dataframe.apply(
-            lambda x: date_grp(x[which_field_original], old_formdate_dataframe,custom_daterange),
+            lambda x: date_grp(x[which_field_original], old_formdate_dataframe,int(custom_daterange)),
             axis=1
         )
         logging.info("dataframe with custom daterange done.")

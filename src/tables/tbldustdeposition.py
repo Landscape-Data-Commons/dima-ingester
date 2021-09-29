@@ -9,12 +9,12 @@ class DustDeposition:
     _table_name = "tblDustDeposition"
     _join_key = "StackID"
 
-    def __init__(self, dimapath):
+    def __init__(self, dimapath, pk_formdate_range):
         self._dimapath = dimapath
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = dust_deposition_raw(self._dimapath)
         logging.info(f"Appending primary key to the {self._table_name}..")
-        self.table_pk = self.get_pk(3)
+        self.table_pk = self.get_pk(pk_formdate_range)
         logging.info("PrimaryKey added.")
         self.final_df = self.tbl_fixes(self.table_pk).drop_duplicates()
 

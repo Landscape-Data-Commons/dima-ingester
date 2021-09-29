@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  pyalpine:
+    build:
+      context: . 
+      dockerfile: src/Dockerfile
+    image: landscapedatacommons/ingester:latest
+    stdin_open: true 
+    tty: true        
+    container_name: pyalpine
+    volumes:
+      - ./dimas:/usr/src/dimas:cached
+# docker-compose run --rm myalpine

@@ -382,6 +382,16 @@ class Table:
 """
 EXTRACTING TABLES FROM ACCESS .MDB FILE INSIDE A CONTAINER (NOT WINDOWS)
 """
+
+ucanaccess_jars = [
+r"/usr/src/src/utils/UCanAccess-5.0.0-bin/ucanaccess-5.0.0.jar",
+r"/usr/src/src/utils/UCanAccess-5.0.0-bin/lib/commons-lang3-3.8.1.jar",
+r"/usr/src/src/utils/UCanAccess-5.0.0-bin/lib/commons-logging-1.2.jar",
+r"/usr/src/src/utils/UCanAccess-5.0.0-bin/lib/hsqldb-2.5.0.jar",
+r"/usr/src/src/utils/UCanAccess-5.0.0-bin/lib/jackcess-3.0.1.jar"]
+
+classpath = ":".join(ucanaccess_jars)
+
 def jdbc_path(path):
     return f'jdbc:ucanaccess://"{path}";newDatabaseVersion=V2010'
 

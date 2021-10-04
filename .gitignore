@@ -7,3 +7,5 @@ pseudocode.py
 **/*.ldb
 **/*.accdb
 **/*.ini
+**/*.csv
+**/*.xlsx

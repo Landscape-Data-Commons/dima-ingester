@@ -10,7 +10,7 @@ Command line application to ingest the tabular contents of DIMA files (access da
 
 ## Set up
 
-# pre run
+### pre run
 Clone this repo into a local directory. Deposit DIMA files to be ingested into the 'dimas' directory. Include the project metadata _.xlsx_ file within this 'dimas' directory. A _database.ini_ file inside the utils directory is required (and not included) with the following format:
 ```ini
 [dima]
@@ -28,7 +28,7 @@ user= ***
 password= ***
 
 ```
-# to run the application
+### to run the application
 
 1. Build the docker image using the docker-compose engine
 ```

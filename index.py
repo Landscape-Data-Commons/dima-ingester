@@ -67,7 +67,7 @@ class main(Cmd):
             print("creating a report for each table...")
             print("******************")
             for i in revised_tablelist:
-                print(f"creating csv report for {}..")
+                print(f"creating csv report for '{self.batch_path}'..")
                 df = looper(self.batch_path, i,"report_table",pk_formdate_range )
                 pk_list = df['dataframe'].PrimaryKey.unique()
                 csv_report(df, table, self.batch_path)
@@ -99,9 +99,9 @@ class main(Cmd):
             True:"dimadev",
             False:"dima"
             }
-        if any([True for i in os.listdir(dir) if '.xlsx' in os.path.splitext(i)[1]]):
+        if any([True for i in os.listdir(self.batch_path) if '.xlsx' in os.path.splitext(i)[1]]):
             batch_looper(self.batch_path, projectkey, dev_or_not, pk_formdate_range)
-            update_project(self.batch_path, projectkey, dev_obj)
+            update_project(self.batch_path, projectkey, dev_obj[dev_or_not])
         else:
             print("No project file found within dima directory; unable to ingest.")
 

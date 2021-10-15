@@ -9,6 +9,6 @@ def csv_report(df, table, batch_path):
     today= datetime.now()
     current_time = today.strftime('%Y-%m-%d-%H:%M:%S')
     filename = f'{table}_report_{current_time}.csv'
-    filepath = os.normpath(os.path.join(batch_path),filename)
+    filepath = os.path.normpath(os.path.join(batch_path,filename))
     df = df['dataframe'].loc[:,['DBKey','PrimaryKey']].drop_duplicates('PrimaryKey')
     df.to_csv(filepath)

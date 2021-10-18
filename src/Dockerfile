@@ -15,7 +15,7 @@ RUN apt-get update && \
 # prepare environment
 WORKDIR /usr/src
 RUN mkdir src
-COPY ./src/requirements.txt ./src
+COPY ./requirements.txt ./src
 
 # install python dependencies
 RUN pip3 install --no-cache-dir -r /usr/src/src/requirements.txt

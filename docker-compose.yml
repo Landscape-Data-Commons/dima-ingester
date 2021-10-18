@@ -7,7 +7,7 @@ services:
     image: landscapedatacommons/ingester:latest
     stdin_open: true 
     tty: true        
-    container_name: pyalpine
+    container_name: ingester
     volumes:
       - ./dimas:/usr/src/dimas:cached
 # docker-compose build

@@ -368,6 +368,37 @@ def colcheck(tablename, conn):
     else:
         print("table does not exist")
 
+possible_tables = {
+    "tblBSNE_TrapCollection":"tblDustDeposition",
+    "tblBSNE_BoxCollection":"tblHorizontalFlux",
+    "tblHorizontalFlux":"tblHorizontalFlux",
+    "tblDustDeposition":"tblDustDeposition",
+    "tblGapDetail":"tblGapDetail",
+    "tblGapHeader":"tblGapHeader",
+    "tblLPIDetail":"tblLPIDetail",
+    "tblLPIHeader":"tblLPIHeader",
+    "tblLines":"tblLines",
+    "tblPlots":"tblPlots",
+    "tblSpecies":"tblSpecies",
+    "tblSpeciesGeneric":"tblSpeciesGeneric",
+    "tblSites":"tblSites",
+    "Projects":"Projects",
+    "tblSoilPits":"tblSoilPits",
+    "tblSoilPitHorizons":"tblSoilPitHorizons",
+    "tblSoilStabDetail":"tblSoilStabDetail",
+    "tblSoilStabHeader":"tblSoilStabHeader",
+    "tblPlantDenDetail":"tblPlantDenDetail",
+    "tblPlantDenHeader":"tblPlantDenHeader",
+    "tblPlantProdDetail":"tblPlantProdDetail",
+    "tblPlantProdHeader":"tblPlantProdHeader",
+    "tblSpecRichHeader":"tblSpecRichHeader",
+    "tblSpecRichDetail":"tblSpecRichDetail",
+    "tblPlotNotes":"tblPlotNotes",
+    "tblQualDetail":"tblQualDetail",
+    "tblQualHeader":"tblQualHeader",
+    "schemaTable":"schemaTable"
+}
+
 
 
 

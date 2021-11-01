@@ -36,7 +36,7 @@ docker-compose build
 ```
 2. Run the interactive python container
 ```
-docker-compose --rm ingester
+docker-compose run --rm ingester
 ```
 
 ## Usage

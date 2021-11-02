@@ -94,11 +94,15 @@ class main(Cmd):
         with form date divided into 3 day classes, and ingest to development database.
 
         """
+
         projectkey, pk_formdate_range, dev_or_not = args.split(" ", 3)
         dev_obj = {
+            'True':"dimadev",
             True:"dimadev",
+            'False':"dima",
             False:"dima"
             }
+
         if any([True for i in os.listdir(self.batch_path) if '.xlsx' in os.path.splitext(i)[1]]):
             batch_looper(self.batch_path, projectkey, dev_or_not, pk_formdate_range)
             update_project(self.batch_path, projectkey, dev_obj[dev_or_not])

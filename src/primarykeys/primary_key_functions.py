@@ -156,14 +156,6 @@ def date_grp(target_date, formdate_df, date_spread):
     date classes.
     given a target_date, the function will
     return which custom date class it belongs to.
-
-    some dates may be out of the custom classes created if the class division:
-    3 day division =  01-01-00 (from day 01 to 03), 01-03-00 (from day 03 to 06)
-    and 01-06-00 (from day 06 to 09) does not include target_date = 10
-
-    the else statement includes any remnant numbers on that extreme of
-    date_range inside the last class.
-
     """
     # logging.info("gathering dates from table..")
     try:
@@ -177,15 +169,22 @@ def date_grp(target_date, formdate_df, date_spread):
         logging.error(e)
 
     finally:
+        # changed logic if-else logic to handle non-iterable
+        # dateranges ( ranges smaller than 2 entries )
         date_range = pd.date_range(start=lst.min(), end=lst.max(), freq=f'{date_spread}D')
-        for i in range(0,len(date_range.tolist())):
-            if i < len(date_range)-1:
-                if target_date in pd.date_range(start=date_range[i], end=date_range[i+1]):
+        if len(date_range)<2:
+            return date_range[0]
+        else:
+            for i in range(0,len(sorted(date_range.tolist()))-1):
+
+                if date_range[i]<=target_date<=date_range[i+1]:
                     return date_range[i]
-            else:
-                which_max=formdate_df.FormDate.max() if "FormDate" in formdate_df.columns else formdate_df.collectDate.max()
-                if target_date in pd.date_range(start=date_range[i], end=which_max):
-                    return date_range[i]
+                else:
+                    which_max=formdate_df.FormDate.max() if "FormDate" in formdate_df.columns else formdate_df.collectDate.max()
+                    if target_date in pd.date_range(start=date_range[i], end=which_max):
+                        return date_range[i]
+
+
 
 def new_form_date(old_formdate_dataframe, custom_daterange):
     """ given a dataframe with a formdate field,
@@ -221,8 +220,12 @@ def header_detail(formdate_dictionary, dimapath):
             simple_table_name = pattern_to_remove.sub('',key)
             header = arcno.MakeTableView(f'tbl{simple_table_name}Header', dimapath)
             detail = arcno.MakeTableView(f'tbl{simple_table_name}Detail', dimapath)
-            df = pd.merge(header,detail, how="inner", on="RecKey")
-            return df
+            # this conditional handles dimas with missing details table
+            if detail.shape[0]>1:
+                df = pd.merge(header,detail, how="inner", on="RecKey")
+                return df
+            else:
+                return header
         else:
             pass
 

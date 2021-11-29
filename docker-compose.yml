@@ -5,8 +5,8 @@ services:
       context: .
       dockerfile: ./src/Dockerfile
     # image: landscapedatacommons/ingester:latest
-    stdin_open: true 
-    tty: true        
+    stdin_open: true
+    tty: true
     container_name: ingester
     volumes:
       - ./dimas:/usr/src/dimas:cached

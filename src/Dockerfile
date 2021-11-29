@@ -1,6 +1,9 @@
 # python ubuntu image
 FROM python:3.8.12-slim-buster
 
+RUN echo "America/Denver" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+
 # install linux dependencies
 RUN apt-get update && \
     apt-get install postgresql \

@@ -25,7 +25,7 @@ def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
             if tablename!='aero_runs':
                 if ("dima" in conn) or ("dimadev" in conn):
 
-                    print("dima or dimadev")
+                    # print("dima or dimadev")
                     table_fields.update({f'{i}':f'{tablefields[possible_tables[tablename]][i]}'})
                 else:
                     print("other schemas")

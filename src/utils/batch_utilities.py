@@ -126,11 +126,12 @@ def looper(path2mdbs, tablename, projk=None, pk_formdate_range=None):
                 logging.info(f"table {tablename} not found within '{i}'")
             else:
                 tbl = table_operations(tablename, os.path.join(containing_folder,i), pk_formdate_range)['db_name']
-                df = table_operations(tablename, os.path.join(containing_folder,i), pk_formdate_range)['operation']()
-                # fix for extrafield in tblLPIHeader
-                df = problem_fields(df,tbl)
+                df_temp = table_operations(tablename, os.path.join(containing_folder,i), pk_formdate_range)['operation']()
 
-                df = dateloaded_dbkey(df, i)
+                # fix for extrafield in tblLPIHeader
+                df_fixed = problem_fields(df_temp,tbl)
+
+                df = dateloaded_dbkey(df_fixed, i)
 
                 if df.size>0:
                     df_dictionary[countup] = df
@@ -228,7 +229,9 @@ def problem_fields(df, tblname):
 
     if "tblLPIHeader" in tblname:
         if "EveryNth_num" in df.columns:
-            df = df.drop(columns="EveryNth_num", inplace=False).copy()
+            df_modified = df.drop(columns="EveryNth_num", inplace=False).copy()
+            return df_modified
+        else:
             return df
     else:
         return df

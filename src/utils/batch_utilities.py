@@ -127,6 +127,9 @@ def looper(path2mdbs, tablename, projk=None, pk_formdate_range=None):
             else:
                 tbl = table_operations(tablename, os.path.join(containing_folder,i), pk_formdate_range)['db_name']
                 df = table_operations(tablename, os.path.join(containing_folder,i), pk_formdate_range)['operation']()
+                # fix for extrafield in tblLPIHeader
+                df = problem_fields(df,tbl)
+
                 df = dateloaded_dbkey(df, i)
 
                 if df.size>0:
@@ -190,9 +193,9 @@ def dateloaded_dbkey(df, filename):
     """
     if 'DateLoadedInDB' in df.columns:
         df['DateLoadedInDB'] = df['DateLoadedInDB'].astype('datetime64')
-        df['DateLoadedInDB'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        df['DateLoadedInDB'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     else:
-        df['DateLoadedInDB'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        df['DateLoadedInDB'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     df['DBKey'] = os.path.split(os.path.splitext(filename)[0])[1].replace(" ","")
     return df
@@ -220,3 +223,12 @@ def table_collector(path2mdbs):
     if "tblBSNE_Box" in table_list:
         table_list.remove("tblBSNE_Box")
     return table_list
+
+def problem_fields(df, tblname):
+
+    if "tblLPIHeader" in tblname:
+        if "EveryNth_num" in df.columns:
+            df = df.drop(columns="EveryNth_num", inplace=False).copy()
+            return df
+    else:
+        return df

@@ -18,4 +18,5 @@ class PlotNotes:
 
 
         def tbl_fixes(self, df):
+            df = df.loc[:,~df.columns.duplicated()]
             return df

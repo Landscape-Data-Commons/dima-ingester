@@ -24,7 +24,7 @@ class Ingester:
         """needs a table first"""
 
         df = df.copy()
-
+        # itll throw truth value is ambiguous if there are dup columns
         escaped = {'\\': '\\\\', '\n': r'\n', '\r': r'\r', '\t': r'\t',}
         for col in df.columns:
             if df.dtypes[col] == 'object':

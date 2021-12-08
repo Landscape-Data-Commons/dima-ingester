@@ -22,11 +22,15 @@ class SoilStabilityHeader:
     def get_pk(self, custom_daterange):
         # primary key flow
         self.pk_source = pk_appender(self._dimapath, custom_daterange)
+        cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
+        cols.append('PrimaryKey')
+
         if self.pk_source is not None:
-            return pd.merge(self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']], how="inner", on=self._join_key)
+            return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 
 
     def tbl_fixes(self, df):
+        df = df.loc[:,~df.columns.duplicated()]
         return df

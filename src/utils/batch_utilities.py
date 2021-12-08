@@ -73,7 +73,7 @@ def table_operations(tablename, dimapath, pk_formdate_range):
             "operation": lambda: DustDeposition(dimapath, pk_formdate_range).final_df
         },
         "tblBSNE_BoxCollection":{
-            "db_name":"tblhorizontalflux",
+            "db_name":"tblHorizontalFlux",
             "operation": lambda: HorizontalFlux(dimapath, pk_formdate_range).final_df
         },
         "tblGapHeader":{
@@ -175,17 +175,18 @@ def batch_looper(dimacontainer, projkey=None, dev=False, pk_formdate_range=None)
     else:
         for table in tablelist:
 
-            obj = looper(dimacontainer,table, projkey, pk_formdate_range)
-            df = obj['dataframe']
-            if tablecheck(obj['db_name'], keyword):
+            dictionary_df = looper(dimacontainer,table, projkey, pk_formdate_range)
+            df = dictionary_df['dataframe']
+            tblname = dictionary_df['db_name']
+            if tablecheck(tblname, keyword):
                 logging.info(f"table '{table}' found; ingesting..")
 
-                Ingester.main_ingest(df, obj['db_name'], d.str, 10000)
+                Ingester.main_ingest(df, tblname, d.str, 10000)
             else:
                 logging.info(f"table '{table}' not found; creating table and ingesting..")
-                table_create(df, obj['db_name'], keyword)
+                table_create(df, tblname, keyword)
 
-                Ingester.main_ingest(df, obj['db_name'], d.str, 10000)
+                Ingester.main_ingest(df, tblname, d.str, 10000)
 
 
 

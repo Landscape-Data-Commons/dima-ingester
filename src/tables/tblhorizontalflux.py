@@ -19,9 +19,6 @@ class HorizontalFlux:
         logging.info("PrimaryKey added.")
         self.final_df = self.tbl_fixes(self.table_pk).drop_duplicates()
 
-
-
-
     def get_pk(self, custom_daterange):
         # primary key flow
         self.pk_source = pk_appender_bsne(self._dimapath, custom_daterange)
@@ -34,4 +31,5 @@ class HorizontalFlux:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 
     def tbl_fixes(self, df):
+        df = df.loc[:,~df.columns.duplicated()]
         return df

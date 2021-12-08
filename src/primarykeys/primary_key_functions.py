@@ -2,6 +2,7 @@ from src.utils.database_functions import arcno
 import pandas as pd
 import re
 import logging
+from datetime import datetime
 
 """
 Primary key strategy:
@@ -158,11 +159,21 @@ def date_grp(target_date, formdate_df, date_spread):
     return which custom date class it belongs to.
     """
     # logging.info("gathering dates from table..")
+    if isinstance(target_date,str):
+        target_date_ts = datetime.strptime(target_date, '%Y-%m-%d %H:%M:%S')
+    else:
+        target_date_ts = target_date.to_pydatetime().date()
     try:
 
         if "FormDate" in formdate_df.columns:
+            # link 1: https://github.com/pandas-dev/pandas/issues/35448
+            # link 2: https://github.com/pandas-dev/pandas/issues/22824
+            # mindate = formdate_df.FormDate.min()
+            # maxdate = formdate_df.FormDate.max()
             lst = formdate_df.FormDate.unique()
         else:
+            # mindate = formdate_df.collectDate.min()
+            # maxdate = formdate_df.collectDate.max()
             lst = formdate_df.collectDate.unique()
 
     except Exception as e:
@@ -171,18 +182,21 @@ def date_grp(target_date, formdate_df, date_spread):
     finally:
         # changed logic if-else logic to handle non-iterable
         # dateranges ( ranges smaller than 2 entries )
+        # date_range = pd.date_range(start=mindate, end=maxdate, freq=f'{date_spread}D')
         date_range = pd.date_range(start=lst.min(), end=lst.max(), freq=f'{date_spread}D')
         if len(date_range)<2:
             return date_range[0]
         else:
-            for i in range(0,len(sorted(date_range.tolist()))-1):
-
-                if date_range[i]<=target_date<=date_range[i+1]:
+            for i in range(0,len(date_range.tolist())-1):
+                if date_range[i] <= target_date_ts < date_range[i+1]:
                     return date_range[i]
+
+                elif target_date_ts>= date_range.max():
+                    # if target date is outside of daterange, return last index
+                    return date_range[date_range.tolist().index(date_range.max())]
+
                 else:
-                    which_max=formdate_df.FormDate.max() if "FormDate" in formdate_df.columns else formdate_df.collectDate.max()
-                    if target_date in pd.date_range(start=date_range[i], end=which_max):
-                        return date_range[i]
+                    pass
 
 
 

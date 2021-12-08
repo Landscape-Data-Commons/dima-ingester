@@ -9,6 +9,6 @@ services:
     tty: true
     container_name: ingester
     volumes:
-      - ./dimas:/usr/src/dimas:cached
+      - ./dimas:/usr/src/dimas
 # docker-compose build
 # docker-compose run --rm ingester

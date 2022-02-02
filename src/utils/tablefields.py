@@ -432,7 +432,7 @@ tablefields= {
         "PlotCustom2Data":"VARCHAR(255)",
         "PlotCustom3Data":"VARCHAR(255)",
         "PlotCustom4Data":"VARCHAR(255)",
-        "ESD_PctGrassCover":"DOUBLE",
+        "ESD_PctGrassCover":"REAL",
         "ESD_ResourceRetentionClass":"BYTE",
         "ESD_bareGapPatchSize":"unused",
         "ESD_grassPatchSize":"unused",

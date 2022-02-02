@@ -40,4 +40,6 @@ class PlantDenSpecies:
         for i in df.columns:
             if i in [i for i in df.columns if ("Class" in i and "total" in i)]:
                 df[i] = df[i].astype(int)
+            if "AllClassesTotal" in i:
+                df[i] = df[i].astype(int)
         return df

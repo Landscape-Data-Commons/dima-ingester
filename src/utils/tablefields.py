@@ -871,9 +871,9 @@ tablefields= {
          'DBKey':"text",
     },
     "tblPlantDenQuads":{
-        'RecKey':"varchar(50)",
+        'RecKey':"varchar(25)",
         'Quadrat':"int",
-        'Description':'text',
+        'Description':'varchar(25)',
         'PrimaryKey':'text',
         'DateLoadedInDB':"timestamp",
         'DBKey':"text",

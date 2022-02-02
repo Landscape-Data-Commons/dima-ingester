@@ -11,7 +11,9 @@ from src.tables import (
     SoilStabilityHeader, SoilStabilityDetail,
     DustDeposition, HorizontalFlux, SoilPits,
     SoilPitHorizons, Sites, Species, SpeciesGeneric,
-    PlantProdHeader, PlantProdDetail, PlotHistory
+    PlantProdHeader, PlantProdDetail, PlotHistory,
+    PlantDenDetail, PlantDenHeader, PlantDenQuads,
+    PlantDenSpecies, SpecRichDetail, SpecRichHeader
     )
 
 def table_operations(tablename, dimapath, pk_formdate_range):
@@ -95,6 +97,30 @@ def table_operations(tablename, dimapath, pk_formdate_range):
         "tblPlotHistory":{
             "db_name": "tblPlotHistory",
             "operation": lambda: PlotHistory(dimapath).final_df
+        },
+        "tblPlantDenDetail":{
+            "db_name": "tblPlantDenDetail",
+            "operation": lambda: PlantDenDetail(dimapath,pk_formdate_range).final_df
+        },
+        "tblPlantDenHeader":{
+            "db_name": "tblPlantDenHeader",
+            "operation": lambda: PlantDenHeader(dimapath, pk_formdate_range).final_df
+        },
+        "tblPlantDenQuads":{
+            "db_name": "tblPlantDenQuads",
+            "operation": lambda: PlantDenQuads(dimapath, pk_formdate_range).final_df
+        },
+        "tblPlantDenSpecies":{
+            "db_name": "tblPlantDenSpecies",
+            "operation": lambda: PlantDenSpecies(dimapath, pk_formdate_range).final_df
+        },
+        "tblSpecRichDetail":{
+            "db_name": "tblSpecRichDetail",
+            "operation": lambda: SpecRichDetail(dimapath, pk_formdate_range).final_df
+        },
+        "tblSpecRichHeader":{
+            "db_name": "tblSpecRichHeader",
+            "operation": lambda: SpecRichHeader(dimapath, pk_formdate_range).final_df
         },
     }
     return table_handling.get(tablename)

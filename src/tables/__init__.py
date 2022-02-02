@@ -16,9 +16,17 @@ from src.tables.tblspeciesgeneric import SpeciesGeneric
 from src.tables.tblplantprodheader import PlantProdHeader
 from src.tables.tblplantproddetail import PlantProdDetail
 from src.tables.tblplothistory import PlotHistory
+from src.tables.tblplantdendetail import PlantDenDetail
+from src.tables.tblplantdenheader import PlantDenHeader
+from src.tables.tblplantdenquads import PlantDenQuads
+from src.tables.tblplantdenspecies import PlantDenSpecies
+from src.tables.tblspecrichheader import SpecRichHeader
+from src.tables.tblspecrichdetail import SpecRichDetail
 
-__all__ = ["Lines", "Plots", "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
+__all__ = [
+"Lines", "Plots", "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
 "SoilStabilityDetail", "DustDeposition", "HorizontalFlux", "SoilPits",
 "SoilPitHorizons", "Sites", "Species", "SpeciesGeneric", "PlantProdHeader",
-"PlantProdDetail", "PlotHistory"
+"PlantProdDetail", "PlotHistory", "PlantDenDetail", "PlantDenHeader", "PlantDenQuads",
+"PlantDenSpecies", "SpecRichHeader", "SpecRichDetail"
 ]

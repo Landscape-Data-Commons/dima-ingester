@@ -39,7 +39,7 @@ class arcno():
       'tblBSNE_BoxCollection',
       'tblBSNE_Stack',
       'tblBSNE_TrapCollection',
-      # new tables
+      # # new tables
       'tblCompactDetail',
       'tblCompactHeader',
       'tblDKDetail',

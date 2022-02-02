@@ -26,9 +26,11 @@ def pk_appender(dimapath, date_range, tablename = None):
     """
     arc = arcno()
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
+    
 
     #
     if tablename is not None:
+
         tables_with_formdate= formdate_correction(tables_with_formdate, tablename)
 
     if any(tables_with_formdate.values()):
@@ -53,7 +55,21 @@ def pk_appender(dimapath, date_range, tablename = None):
 
 def formdate_correction(obj, tablename):
     obj_copy = obj.copy()
+    # default:
     st = f"{tablename}".split('Detail')[0]
+    # special cases:
+    if "Detail" in tablename:
+        st = f"{tablename}".split('Detail')[0]
+    elif "PlantDenDetail" in tablename:
+        st = f"{tablename}".split('Detail')[0]
+    elif "PlantDenHeader" in tablename:
+        st = f"{tablename}".split('Detail')[0]
+    elif "PlantDenQuads" in tablename:
+        st = f"{tablename}".split('Quads')[0]
+    elif "PlantDenSpecies" in tablename:
+        st = f"{tablename}".split('Species')[0]
+    elif "SpecRichDetail" in tablename:
+        st = f"{tablename}".split('Detail')[0]
     for i in obj_copy.keys():
         if obj_copy[i] is True:
             if st in i:

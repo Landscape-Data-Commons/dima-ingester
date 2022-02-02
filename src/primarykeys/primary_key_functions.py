@@ -26,15 +26,13 @@ def pk_appender(dimapath, date_range, tablename = None):
     """
     arc = arcno()
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
-    
 
     #
     if tablename is not None:
-
         tables_with_formdate= formdate_correction(tables_with_formdate, tablename)
 
-    if any(tables_with_formdate.values()):
 
+    if any(tables_with_formdate.values()):
         header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
                            # dataframe with old formdate
         new_formdate_df = new_form_date(header_detail_df, date_range) # returns
@@ -59,10 +57,6 @@ def formdate_correction(obj, tablename):
     st = f"{tablename}".split('Detail')[0]
     # special cases:
     if "Detail" in tablename:
-        st = f"{tablename}".split('Detail')[0]
-    elif "PlantDenDetail" in tablename:
-        st = f"{tablename}".split('Detail')[0]
-    elif "PlantDenHeader" in tablename:
         st = f"{tablename}".split('Detail')[0]
     elif "PlantDenQuads" in tablename:
         st = f"{tablename}".split('Quads')[0]

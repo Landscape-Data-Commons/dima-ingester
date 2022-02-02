@@ -93,7 +93,7 @@ class arcno():
         'TBLPLANTPRODHEADER':'tblPlantProdHeader',
         'TBLPLANTPRODDETAIL':'tblPlantProdDetail',
         'TBLPLOTNOTES':'tblPlotNotes',
-        'TBLPLANTDENHEADER':'tblPlantDenDetail',
+        'TBLPLANTDENHEADER':'tblPlantDenHeader',
         'TBLPLANTDENDETAIL':'tblPlantDenDetail',
         'TBLSPECIES':'tblSpecies',
         'TBLSPECIESGENERIC':'tblSpeciesGeneric',

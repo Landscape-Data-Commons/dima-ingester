@@ -22,11 +22,12 @@ from src.tables.tblplantdenquads import PlantDenQuads
 from src.tables.tblplantdenspecies import PlantDenSpecies
 from src.tables.tblspecrichheader import SpecRichHeader
 from src.tables.tblspecrichdetail import SpecRichDetail
+from src.tables.tblplotnotes import PlotNotes
 
 __all__ = [
 "Lines", "Plots", "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
 "SoilStabilityDetail", "DustDeposition", "HorizontalFlux", "SoilPits",
 "SoilPitHorizons", "Sites", "Species", "SpeciesGeneric", "PlantProdHeader",
 "PlantProdDetail", "PlotHistory", "PlantDenDetail", "PlantDenHeader", "PlantDenQuads",
-"PlantDenSpecies", "SpecRichHeader", "SpecRichDetail"
+"PlantDenSpecies", "SpecRichHeader", "SpecRichDetail", "PlotNotes"
 ]

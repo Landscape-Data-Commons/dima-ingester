@@ -13,7 +13,8 @@ from src.tables import (
     SoilPitHorizons, Sites, Species, SpeciesGeneric,
     PlantProdHeader, PlantProdDetail, PlotHistory,
     PlantDenDetail, PlantDenHeader, PlantDenQuads,
-    PlantDenSpecies, SpecRichDetail, SpecRichHeader
+    PlantDenSpecies, SpecRichDetail, SpecRichHeader,
+    PlotNotes
     )
 
 def table_operations(tablename, dimapath, pk_formdate_range):

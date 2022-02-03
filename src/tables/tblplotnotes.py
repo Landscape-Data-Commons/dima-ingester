@@ -13,7 +13,7 @@ class PlotNotes:
         self._dimapath = dimapath
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
-        logging.info("PrimaryKey added.")
+        # logging.info("PrimaryKey added.")
         self.final_df = self.tbl_fixes(self.raw_table).drop_duplicates()
 
 

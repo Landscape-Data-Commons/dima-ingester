@@ -36,10 +36,12 @@ class PlantDenHeader:
     def tbl_fixes(self, df):
         df = df.loc[:,~df.columns.duplicated()]
 
-        df = df.fillna(0)
+        # df = df.fillna(0)
         for i in df.columns:
             if i in [i for i in df.columns if ("Class" in i and "total" in i)]:
+                df[i] = df[i].fillna(0)
                 df[i] = df[i].astype(int)
             if "AllClassesTotal" in i:
+                df[i] = df[i].fillna(0)
                 df[i] = df[i].astype(int)
         return df

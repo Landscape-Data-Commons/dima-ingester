@@ -15,7 +15,7 @@ class SpeciesGeneric:
         self.final_df = self.tbl_fixes(self.raw_table).drop_duplicates()
 
     def tbl_fixes(self, df):
-        df = df.loc[:,~df.columns.duplicated()]
+        df = df.loc[:,~df.columns.duplicated()].copy(deep=True)
 
         # df = df.fillna(0)
         for i in df.columns:

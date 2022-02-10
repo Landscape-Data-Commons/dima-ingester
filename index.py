@@ -104,7 +104,7 @@ class main(Cmd):
             }
 
         if any([True for i in os.listdir(self.batch_path) if '.xlsx' in os.path.splitext(i)[1]]):
-            batch_looper(self.batch_path, projectkey, dev_or_not, pk_formdate_range)
+            batch_looper(self.batch_path, projectkey, dev_or_not[dev_or_not], pk_formdate_range)
             update_project(self.batch_path, projectkey, dev_obj[dev_or_not])
         else:
             print("No project file found within dima directory; unable to ingest.")

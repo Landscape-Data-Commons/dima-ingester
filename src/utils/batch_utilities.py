@@ -181,17 +181,20 @@ def looper(path2mdbs, tablename, projk=None, pk_formdate_range=None):
     else:
         logging.info(f"table '{tablename}' not found within this dima batch")
 
-def batch_looper(dimacontainer, projkey=None, dev=False, pk_formdate_range=None):
+def batch_looper(dimacontainer, projkey=None, dev='False', pk_formdate_range=None):
 
     """
     addition
     creates an exhaustive list of tables across all dimas in a folder
     and then uses looper to gothrough the list of tables and ingest them
     """
-    if dev==False:
+    dev = str(dev)
+    print(dev, "inside batch_looper, presending to pg")
+    logging.info(f"inside batch_looper, presending to pg: {dev}.")
+    if dev=='False':
         d = db('dima')
         keyword = "dima"
-    else:
+    elif dev=='True':
         d = db("dimadev")
         keyword = "dimadev"
 
@@ -205,6 +208,8 @@ def batch_looper(dimacontainer, projkey=None, dev=False, pk_formdate_range=None)
             dictionary_df = looper(dimacontainer,table, projkey, pk_formdate_range)
             df = dictionary_df['dataframe']
             tblname = dictionary_df['db_name']
+            print(dev, "ALMOST INGESTED")
+            logging.info(f"ALMOST INGESTED: '{dev}'.")
             if tablecheck(tblname, keyword):
                 logging.info(f"table '{table}' found; ingesting..")
 

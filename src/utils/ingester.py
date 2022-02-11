@@ -4,6 +4,7 @@ import psycopg2
 import re
 import os, os.path
 import pandas as pd
+import logging
 
 class Ingester:
 
@@ -31,6 +32,7 @@ class Ingester:
                 for v, e in escaped.items():
                     df[col] = df[col].apply(lambda x: x.replace(v, '') if (x is not None) and (isinstance(x,str)) else x)
         try:
+            logging.info(f"{table}: {df.columns}")
             conn = connection
             cursor = conn.cursor()
             for i in tqdm(range(0, df.shape[0], chunk_size)):

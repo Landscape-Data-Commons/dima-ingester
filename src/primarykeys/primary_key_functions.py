@@ -47,7 +47,7 @@ def pk_appender(dimapath, date_range, tablename = None):
             full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
         final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
 
-        return final_df.loc[:,["LineKey","RecKey","PlotKey", "PrimaryKey"]]
+        return final_df.filter(["LineKey","RecKey","PlotKey", "PrimaryKey"])
     else:
         pass
 
@@ -92,7 +92,7 @@ def pk_appender_bsne(dimapath, date_range):
         new_formdate_df.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
     final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "collectDatePK")
 
-    return final_df.loc[:,array_to_return]
+    return final_df.filter(array_to_return)
 
 def pk_appender_soil(dimapath, date_range):
     """ create header/detail dataframe with the new formdate,
@@ -107,6 +107,13 @@ def pk_appender_soil(dimapath, date_range):
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
     header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
                        # dataframe with old formdate
+
+    # introduced line+plots to help associate soil tables to headers/details
+    line_plot = get_plotkeys(dimapath)
+
+    header_detail_df = pd.merge(header_detail_df, line_plot, how="inner", on="LineKey")
+
+    #######
     new_formdate_df = new_form_date(header_detail_df, date_range) # returns
                       # dataframe with new formdate range
 
@@ -116,13 +123,25 @@ def pk_appender_soil(dimapath, date_range):
         full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
     final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
 
-    return final_df.loc[:,["HorizonKey","PlotKey", "PrimaryKey"]]
+    return final_df.filter(["HorizonKey","PlotKey", "PrimaryKey"])
 
 def soil_pits_raw(dimapath):
     logging.info("Creating raw table from soilpits and soilpithorizons..")
     horizons = arcno.MakeTableView("tblSoilPitHorizons",dimapath)
     pits = arcno.MakeTableView("tblSoilPits", dimapath)
-    return pd.merge(pits,horizons, how="inner", on="SoilKey")
+
+    if (horizons.size>0) & (pits.size>0):
+        # if both exist
+        return pd.merge(pits,horizons, how="inner", on="SoilKey")
+    elif (horizons.size>0) & (pits.size<=0):
+        # if only horizons exist
+        return horizons
+    elif (horizons.size<=0) & (pits.size>0):
+        # if only pits exist
+        return pits
+    else:
+        # if neither exists
+        pass
 
 def dust_deposition_raw(dimapath):
     logging.info("Creating raw table from BSNE tblBSNE_TrapCollection and Stack")

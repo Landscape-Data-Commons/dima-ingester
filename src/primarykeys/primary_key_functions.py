@@ -117,10 +117,10 @@ def pk_appender_soil(dimapath, date_range):
     new_formdate_df = new_form_date(header_detail_df, date_range) # returns
                       # dataframe with new formdate range
 
+    if 'PlotKey_x' in new_formdate_df.columns:
+        new_formdate_df.drop(['PlotKey_x'], axis=1, inplace=True)
+        new_formdate_df.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
     full_join = pd.merge(new_formdate_df, soilpk, how="inner", on="PlotKey")
-    if 'PlotKey_x' in full_join.columns:
-        full_join.drop(['PlotKey_x'], axis=1, inplace=True)
-        full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
     final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
 
     return final_df.filter(["HorizonKey","PlotKey", "PrimaryKey"])

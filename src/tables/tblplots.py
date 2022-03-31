@@ -22,17 +22,27 @@ class Plots:
     def get_pk(self, custom_daterange):
         # join to pk source with
         tables_with_formdate = form_date_check(self._dimapath)
-        if any(tables_with_formdate.values())==False and any([i for i in tables_with_formdate.keys() if "tblBSNE" in i])==True:
-            self.pk_source = pk_appender_bsne(self._dimapath, custom_daterange)
+        if any(
+            tables_with_formdate.values())==False and any([
+                i for i in tables_with_formdate.keys() if "tblBSNE" in i
+                ])==True:
+            self.pk_source = pk_appender_bsne(self._dimapath,
+                custom_daterange).drop_duplicates(ignore_index=True)
         else:
-            self.pk_source = pk_appender(self._dimapath, custom_daterange)
+            self.pk_source = pk_appender(self._dimapath,
+                custom_daterange).drop_duplicates(ignore_index=True)
 
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')
 
         if self.pk_source is not None:
-            return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
+            return pd.concat([
+                self.raw_table,
+                self.pk_source.filter([self._join_key,
+                                       'PrimaryKey'
+                                       ]).drop_duplicates(ignore_index=True)],
+                axis=1, join="inner").loc[:,cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

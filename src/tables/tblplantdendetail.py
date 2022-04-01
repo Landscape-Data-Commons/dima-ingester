@@ -32,12 +32,12 @@ class PlantDenDetail:
 
         if self.pk_source is not None:
             # return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
-            return pd.concat([
+            return pd.merge(
                 self.raw_table,
                 self.pk_source.filter([self._join_key,
                                        'PrimaryKey'
-                                       ]).drop_duplicates(ignore_index=True)],
-                axis=1, join="inner").loc[:,cols]
+                                       ]).drop_duplicates(ignore_index=True),
+                how="inner", on=self._join_key).loc[:,cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

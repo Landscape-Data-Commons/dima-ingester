@@ -25,19 +25,19 @@ class PlantDenQuads:
         self.pk_source = pk_appender(
             self._dimapath,
             custom_daterange,
-            self._table_name).ignore_index(ignore_index=True)
+            self._table_name)
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')
 
         if self.pk_source is not None:
             # return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
-            return pd.concat([
+            return pd.merge(
                 self.raw_table,
                 self.pk_source.filter([self._join_key,
                                        'PrimaryKey'
-                                       ]).drop_duplicates(ignore_index=True)],
-                axis=1, join="inner").loc[:,cols]
+                                       ]).drop_duplicates(ignore_index=True),
+                how="inner", on=self._join_key).loc[:,cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

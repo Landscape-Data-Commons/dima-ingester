@@ -95,6 +95,7 @@ class arcno():
         'TBLPLOTNOTES':'tblPlotNotes',
         'TBLPLANTDENHEADER':'tblPlantDenHeader',
         'TBLPLANTDENDETAIL':'tblPlantDenDetail',
+
         'TBLSPECIES':'tblSpecies',
         'TBLSPECIESGENERIC':'tblSpeciesGeneric',
         'TBLSITES':'tblSites',
@@ -449,7 +450,12 @@ def config(filename='src/utils/database.ini', section='postgresql'):
     parser = ConfigParser()
     parser.read(filename)
 
-    db = {}
+    db = {
+        "keepalives": 1,
+        "keepalives_idle": 30,
+        "keepalives_interval": 5,
+        "keepalives_count": 5,
+    }
     if parser.has_section(section):
         params = parser.items(section)
         for param in params:
@@ -467,7 +473,12 @@ def dimaconfig(filename='src/utils/database.ini', section='dima'):
     parser = ConfigParser()
     parser.read(filename)
 
-    db = {}
+    db = {
+        "keepalives": 1,
+        "keepalives_idle": 30,
+        "keepalives_interval": 5,
+        "keepalives_count": 5,
+    }
     if parser.has_section(section):
         params = parser.items(section)
         for param in params:

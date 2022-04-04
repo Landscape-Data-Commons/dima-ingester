@@ -1,0 +1,7 @@
+{
+  "bsne": ["tblDustDeposition", "tblHorizontalFlux","tblLines","tblPlots", "tblSoilPitHorizons", "tblSoilPits"],
+  "soil": ["tblSoilPits", "tblSoilPitHorizons"],
+  "joinkeys":{
+    "tblLines":"PlotKey"
+  }
+}

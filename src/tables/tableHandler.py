@@ -12,10 +12,6 @@ import os
 import pandas as pd
 import logging
 
-#### generic table handler
-config = r"C:\Users\kbonefont\Documents\GitHub\ingester_v3\src\utils\configs.json"
-
-
 class TableHandler:
 
     def __init__(self, dimapath, pk_formdate_range, tablename):

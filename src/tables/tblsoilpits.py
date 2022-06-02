@@ -24,10 +24,12 @@ class SoilPits:
             self.pk_source = pk_appender_bsne(
                 self._dimapath,
                 custom_daterange).drop_duplicates(ignore_index=True)
+
         else:
             self.pk_source = pk_appender_soil(
                 self._dimapath,
-                custom_daterange).drop_duplicates(ignore_index=True)
+                custom_daterange,
+                self._table_name).drop_duplicates(ignore_index=True)
 
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
@@ -37,10 +39,9 @@ class SoilPits:
             # return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
             return pd.merge(
                 self.raw_table,
-                self.pk_source.filter([self._join_key,
-                                       'PrimaryKey'
-                                       ]).drop_duplicates(ignore_index=True),
-                how="inner", on=self._join_key).loc[:,cols]
+                self.pk_source,
+                suffixes=(None, '_y'),
+                how="inner", on=self._join_key)[cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

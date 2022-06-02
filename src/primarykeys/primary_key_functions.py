@@ -2,7 +2,7 @@ from src.utils.database_functions import arcno
 import pandas as pd
 import re
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 """
 Primary key strategy:
@@ -28,7 +28,7 @@ def pk_appender(dimapath, date_range, tablename = None):
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
 
     #
-    if tablename is not None:
+    if (tablename is not None) and ("tblLines" not in tablename or "tblPlots" not in tablename) :
         tables_with_formdate= formdate_correction(tables_with_formdate, tablename)
 
 
@@ -39,19 +39,24 @@ def pk_appender(dimapath, date_range, tablename = None):
                           # dataframe with new formdate range
 
         # all big tables need plotkey, which comes from lines+plot join
-
+        joinkey = None
         line_plot = get_plotkeys(dimapath)
-        full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey")
+        if "LineKey" in new_formdate_df.columns:
+            joinkey = "LineKey"
+        elif "PlotKey" in new_formdate_df.columns:
+            joinkey = "PlotKey"
+        full_join = pd.merge(new_formdate_df, line_plot, how="inner", on=joinkey)
+
         if 'PlotKey_x' in full_join.columns:
             full_join.drop(['PlotKey_x'], axis=1, inplace=True)
             full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
         final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
 
-        return final_df.filter(["LineKey","RecKey","PlotKey", "PrimaryKey"])
+        return final_df
     else:
         pass
 
-def formdate_correction(obj, tablename):
+def formdate_correction(obj, tablename = None):
     obj_copy = obj.copy()
     # default:
     st = f"{tablename}".split('Detail')[0]
@@ -64,6 +69,8 @@ def formdate_correction(obj, tablename):
         st = f"{tablename}".split('Species')[0]
     elif "SpecRichDetail" in tablename:
         st = f"{tablename}".split('Detail')[0]
+    elif "SoilPits" in tablename:
+        st = "tblLPIHeader"
     for i in obj_copy.keys():
         if obj_copy[i] is True:
             if st in i:
@@ -92,9 +99,9 @@ def pk_appender_bsne(dimapath, date_range):
         new_formdate_df.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
     final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "collectDatePK")
 
-    return final_df.filter(array_to_return)
+    return final_df
 
-def pk_appender_soil(dimapath, date_range):
+def pk_appender_soil(dimapath, date_range, tablename = None):
     """ create header/detail dataframe with the new formdate,
     then return a dataframe with a primary key made from
     plotkey + formdate
@@ -105,6 +112,8 @@ def pk_appender_soil(dimapath, date_range):
 
     soilpk = soil_pits_raw(dimapath)
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
+    tables_with_formdate = formdate_correction(tables_with_formdate, tablename)
+
     header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
                        # dataframe with old formdate
 
@@ -180,7 +189,7 @@ def form_date_check(dimapath):
             obj[i] = False
     return obj
 
-def date_grp(target_date, formdate_df, date_spread):
+def date_grp(target_date, formdate_df, windowsize):
     """ given a daterange size (date_spread),
     de formdate field will be broken down into
     date classes.
@@ -212,21 +221,39 @@ def date_grp(target_date, formdate_df, date_spread):
         # changed logic if-else logic to handle non-iterable
         # dateranges ( ranges smaller than 2 entries )
         # date_range = pd.date_range(start=mindate, end=maxdate, freq=f'{date_spread}D')
-        date_range = pd.date_range(start=lst.min(), end=lst.max(), freq=f'{date_spread}D')
-        if len(date_range)<2:
-            return date_range[0]
-        else:
-            for i in range(0,len(date_range.tolist())-1):
-                if date_range[i] <= target_date_ts < date_range[i+1]:
-                    return date_range[i]
+        # date_range = pd.date_range(start=lst.min(), end=lst.max(), freq=f'{date_spread}D')
+        # if len(date_range)<2:
+        #     return date_range[0]
+        # else:
+        #     for i in range(0,len(date_range.tolist())-1):
+        #         if date_range[i] <= target_date_ts < date_range[i+1]:
+        #             return date_range[i]
+        #
+        #         elif target_date_ts>= date_range.max():
+        #             # if target date is outside of daterange, return last index
+        #             return date_range[date_range.tolist().index(date_range.max())]
+        #
+        #         else:
+        #             pass
+        # initlist = df.FormDate.unique()
+        for i in lst:
+            rng = pd.date_range(
+                    start=pd.to_datetime(i)-timedelta(days=windowsize),
+                    end=pd.to_datetime(i)+timedelta(days=windowsize),
+                    freq=f'{2*windowsize}D')
+            if within(target_date,rng):
+                return i
+            else:
+                pass
 
-                elif target_date_ts>= date_range.max():
-                    # if target date is outside of daterange, return last index
-                    return date_range[date_range.tolist().index(date_range.max())]
 
-                else:
-                    pass
-
+def within(date, range):
+    start = range[0]
+    end =  range[len(range)-1]
+    if start<= pd.to_datetime(date) <=end:
+        return True
+    else:
+        return False
 
 
 def new_form_date(old_formdate_dataframe, custom_daterange):

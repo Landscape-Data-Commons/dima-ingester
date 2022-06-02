@@ -16,7 +16,7 @@ class PlantDenDetail:
         logging.info(f"Appending primary key to the {self._table_name}..")
         self.table_pk = self.get_pk(pk_formdate_range)
         logging.info("PrimaryKey added.")
-        self.final_df = self.tbl_fixes(self.table_pk).drop_duplicates()
+        self.final_df = self.tbl_fixes(self.table_pk)
 
 
 
@@ -34,10 +34,9 @@ class PlantDenDetail:
             # return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
             return pd.merge(
                 self.raw_table,
-                self.pk_source.filter([self._join_key,
-                                       'PrimaryKey'
-                                       ]).drop_duplicates(ignore_index=True),
-                how="inner", on=self._join_key).loc[:,cols]
+                self.pk_source,
+                suffixes=(None, '_y'),
+                how="inner", on=self._join_key)[cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

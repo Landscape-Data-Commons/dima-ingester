@@ -16,7 +16,7 @@ class PlantProdDetail:
         logging.info(f"Appending primary key to the {self._table_name}..")
         self.table_pk = self.get_pk(pk_formdate_range)
         logging.info("PrimaryKey added.")
-        self.final_df = self.tbl_fixes(self.table_pk).drop_duplicates()
+        self.final_df = self.tbl_fixes(self.table_pk)
 
     def get_pk(self, custom_daterange):
         # primary key flow

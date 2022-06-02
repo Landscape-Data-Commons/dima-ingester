@@ -123,6 +123,14 @@ def table_operations(tablename, dimapath, pk_formdate_range):
             "db_name": "tblSpecRichHeader",
             "operation": lambda: SpecRichHeader(dimapath, pk_formdate_range).final_df
         },
+        "tblSoilStabHeader":{
+            "db_name": "tblSoilStabHeader",
+            "operation": lambda: SoilStabilityHeader(dimapath, pk_formdate_range).final_df
+        },
+        "tblSoilStabDetail":{
+            "db_name": "tblSoilStabDetail",
+            "operation": lambda: SoilStabilityDetail(dimapath, pk_formdate_range).final_df
+        },
     }
     return table_handling.get(tablename)
 

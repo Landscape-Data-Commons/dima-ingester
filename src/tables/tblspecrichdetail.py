@@ -34,10 +34,9 @@ class SpecRichDetail:
             # return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
             return pd.merge(
                 self.raw_table,
-                self.pk_source.filter([self._join_key,
-                                       'PrimaryKey'
-                                       ]).drop_duplicates(ignore_index=True),
-                how="inner", on=self._join_key).loc[:,cols]
+                self.pk_source,
+                suffixes=(None, '_y'),
+                how="inner", on=self._join_key)[cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

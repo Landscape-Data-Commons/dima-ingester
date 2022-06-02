@@ -12,6 +12,14 @@ import os
 import pandas as pd
 import logging
 
+#### generic table handler
+config = r"C:\Users\kbonefont\OneDrive - USDA\Documents\GitHub\ingester_v3\src\utils\configs.json"
+[i for i in data['bsne']]
+
+
+dir = r"C:\Users\kbonefont\OneDrive - USDA\Documents\GitHub\ingester_v3\dimas"
+
+
 class TableHandler:
 
     def __init__(self, dimapath, pk_formdate_range, tablename):

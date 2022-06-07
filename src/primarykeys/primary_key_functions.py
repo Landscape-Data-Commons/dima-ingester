@@ -69,7 +69,7 @@ def formdate_correction(obj, tablename = None):
         st = f"{tablename}".split('Species')[0]
     elif "SpecRichDetail" in tablename:
         st = f"{tablename}".split('Detail')[0]
-    elif "SoilPits" in tablename:
+    elif "SoilPit" in tablename:
         st = "tblLPIHeader"
     for i in obj_copy.keys():
         if obj_copy[i] is True:
@@ -89,7 +89,7 @@ def pk_appender_bsne(dimapath, date_range):
     works for dustdepostion tables like bsne_box, tblBSNE_Stack, tblBSNE_BoxCollection
     """
     arc = arcno(dimapath)
-    array_to_return = ["StackID","PlotKey", "PrimaryKey"] if "tblBSNE_TrapCollection" in arc.actual_list else ["BoxID","PlotKey", "PrimaryKey"]
+    # array_to_return = ["StackID","PlotKey", "PrimaryKey"] if "tblBSNE_TrapCollection" in arc.actual_list else ["BoxID","PlotKey", "PrimaryKey"]
     raw_bsne = dust_deposition_raw(dimapath) if "tblBSNE_TrapCollection" in arc.actual_list else horizontalflux_raw(dimapath)
     # raw_bsne = dust_deposition_raw(dimapath)
     new_formdate_df = new_form_date(raw_bsne, date_range)
@@ -160,7 +160,6 @@ def dust_deposition_raw(dimapath):
     logging.info("raw bsne table done.")
     return df
 
-
 def horizontalflux_raw(dimapath):
     logging.info("Creating raw table from BSNE Box, Box Collection and Stack")
     box = arcno.MakeTableView("tblBSNE_Box",dimapath)
@@ -171,7 +170,6 @@ def horizontalflux_raw(dimapath):
     collected_boxes = pd.merge(plotted_boxes,boxcol, how="inner", on="BoxID")
     logging.info("raw bsne table done.")
     return collected_boxes
-
 
 def form_date_check(dimapath):
     """ returns dictionary with all the
@@ -189,7 +187,7 @@ def form_date_check(dimapath):
             obj[i] = False
     return obj
 
-def date_grp(target_date, formdate_df, windowsize):
+def date_grp(target_date, formdate_df, window_size):
     """ given a daterange size (date_spread),
     de formdate field will be broken down into
     date classes.
@@ -204,15 +202,13 @@ def date_grp(target_date, formdate_df, windowsize):
     try:
 
         if "FormDate" in formdate_df.columns:
-            # link 1: https://github.com/pandas-dev/pandas/issues/35448
-            # link 2: https://github.com/pandas-dev/pandas/issues/22824
-            # mindate = formdate_df.FormDate.min()
-            # maxdate = formdate_df.FormDate.max()
             lst = formdate_df.FormDate.unique()
-        else:
-            # mindate = formdate_df.collectDate.min()
-            # maxdate = formdate_df.collectDate.max()
+
+        elif "collectDate" in formdate_df.columns:
             lst = formdate_df.collectDate.unique()
+
+        else:
+            lst = formdate_df.DateRecorded.unique()
 
     except Exception as e:
         logging.error(e)
@@ -238,14 +234,13 @@ def date_grp(target_date, formdate_df, windowsize):
         # initlist = df.FormDate.unique()
         for i in lst:
             rng = pd.date_range(
-                    start=pd.to_datetime(i)-timedelta(days=windowsize),
-                    end=pd.to_datetime(i)+timedelta(days=windowsize),
-                    freq=f'{2*windowsize}D')
+                    start=pd.to_datetime(i)-timedelta(days=window_size),
+                    end=pd.to_datetime(i)+timedelta(days=window_size),
+                    freq=f'{2*window_size}D')
             if within(target_date,rng):
                 return i
             else:
                 pass
-
 
 def within(date, range):
     start = range[0]
@@ -255,8 +250,7 @@ def within(date, range):
     else:
         return False
 
-
-def new_form_date(old_formdate_dataframe, custom_daterange):
+def new_form_date(old_formdate_dataframe, window_size):
     """ given a dataframe with a formdate field,
     returns a dataframe with a new formdate field with custom daterange classes
     for primarykey creation
@@ -270,12 +264,16 @@ def new_form_date(old_formdate_dataframe, custom_daterange):
         elif "collectDate" in old_formdate_dataframe.columns:
             which_field = 'collectDatePK'
             which_field_original = 'collectDate'
+        elif "DateRecorded" in old_formdate_dataframe.columns:
+            which_field = "DateRecordedPK"
+            which_field_original = "DateRecorded"
+
     except Exception as e:
         logging.error("no usable daterange field found in dataframe!")
     finally:
 
         old_formdate_dataframe[which_field] = old_formdate_dataframe.apply(
-            lambda x: date_grp(x[which_field_original], old_formdate_dataframe,int(custom_daterange)),
+            lambda x: date_grp(x[which_field_original], old_formdate_dataframe,int(window_size)),
             axis=1
         )
         logging.info("dataframe with custom daterange done.")

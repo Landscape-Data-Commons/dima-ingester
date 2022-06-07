@@ -9,6 +9,7 @@ import jaydebeapi
 import platform
 import pyodbc
 import platform
+import warnings
 
 
 class arcno():
@@ -40,40 +41,40 @@ class arcno():
       'tblBSNE_Stack',
       'tblBSNE_TrapCollection',
       # # new tables
-      # 'tblCompactDetail',
-      # 'tblCompactHeader',
-      # 'tblDKDetail',
-      # 'tblDKHeader',
-      # 'tblDryWtCompYield',
-      # 'tblDryWtDetail',
-      # 'tblDryWtHeader',
-      # 'tblESDDominantPerennialHeights',
-      # 'tblESDRockFragments',
-      # 'tblESDWaypoints',
-      # 'tblInfiltrationDetail',
-      # 'tblInfiltrationHeader',
-      # 'tblLICDetail',
-      # 'tblLICHeader',
-      # 'tblLICSpecies',
-      # 'tblNestedFreqDetail',
-      # 'tblNestedFreqHeader',
-      # 'tblNestedFreqSpeciesDetail',
-      # 'tblNestedFreqSpeciesSummary',
-      # 'tblOcularCovDetail',
-      # 'tblOcularCovHeader',
-      # 'tblPlantDenQuads',
-      # 'tblPlantDenSpecies',
-      # 'tblPlantLenDetail',
-      # 'tblPlantLenHeader',
-      # 'tblPlotHistory',
-      # 'tblPTFrameDetail',
-      # 'tblPTFrameHeader',
-      # 'tblQualDetail',
-      # 'tblQualHeader',
-      # 'tblSpeciesGrowthHabits',
-      # 'tblSpeciesRichAbundance',
-      # 'tblTreeDenDetail',
-      # 'tblTreeDenHeader'
+      'tblCompactDetail',
+      'tblCompactHeader',
+      'tblDKDetail',
+      'tblDKHeader',
+      'tblDryWtCompYield',
+      'tblDryWtDetail',
+      'tblDryWtHeader',
+      'tblESDDominantPerennialHeights',
+      'tblESDRockFragments',
+      'tblESDWaypoints',
+      'tblInfiltrationDetail',
+      'tblInfiltrationHeader',
+      'tblLICDetail',
+      'tblLICHeader',
+      'tblLICSpecies',
+      'tblNestedFreqDetail',
+      'tblNestedFreqHeader',
+      'tblNestedFreqSpeciesDetail',
+      'tblNestedFreqSpeciesSummary',
+      'tblOcularCovDetail',
+      'tblOcularCovHeader',
+      'tblPlantDenQuads',
+      'tblPlantDenSpecies',
+      'tblPlantLenDetail',
+      'tblPlantLenHeader',
+      'tblPlotHistory',
+      'tblPTFrameDetail',
+      'tblPTFrameHeader',
+      'tblQualDetail',
+      'tblQualHeader',
+      'tblSpeciesGrowthHabits',
+      'tblSpeciesRichAbundance',
+      'tblTreeDenDetail',
+      'tblTreeDenHeader'
       ]
     correct = {
         'TBLPLOTS':'tblPlots',
@@ -357,6 +358,8 @@ class Table:
         con.setencoding(encoding='utf-16le') if platform.system()=='Windows' else None
 
         query = f'SELECT * FROM "{self.in_table}"' if platform.system()=='Windows' else f'SELECT * FROM {self.in_table}'
+        # with warnings.catch_warnings():
+        #      warnings.simplefilter('ignore', UserWarning)
         self.temp = pd.read_sql(query,con)
 
     def temp(self):

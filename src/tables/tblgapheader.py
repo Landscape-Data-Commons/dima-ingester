@@ -31,11 +31,18 @@ class GapHeader:
 
         if self.pk_source is not None:
             # return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
+            # return pd.merge(
+            #     self.raw_table,
+            #     self.pk_source,
+            #     suffixes=(None, '_y'),
+            #     how="inner", on=self._join_key)[cols]
             return pd.merge(
                 self.raw_table,
                 self.pk_source,
+                how="left",
                 suffixes=(None, '_y'),
-                how="inner", on=self._join_key)[cols]
+                left_on=["LineKey", "RecKey"],
+                right_on=["LineKey", "RecKey"])[cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

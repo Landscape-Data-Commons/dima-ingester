@@ -35,21 +35,17 @@ def pk_appender(dimapath, date_range, tablename = None):
     if any(tables_with_formdate.values()):
         header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
                            # dataframe with old formdate
-        new_formdate_df = new_form_date(header_detail_df, date_range) # returns
+        new_formdate_df = new_form_date(header_detail_df, date_range)
                           # dataframe with new formdate range
-
         # all big tables need plotkey, which comes from lines+plot join
-        joinkey = None
-        line_plot = get_plotkeys(dimapath)
-        if "LineKey" in new_formdate_df.columns:
-            joinkey = "LineKey"
-        elif "PlotKey" in new_formdate_df.columns:
-            joinkey = "PlotKey"
-        full_join = pd.merge(new_formdate_df, line_plot, how="inner", on=joinkey)
 
-        if 'PlotKey_x' in full_join.columns:
-            full_join.drop(['PlotKey_x'], axis=1, inplace=True)
-            full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+        line_plot = get_plotkeys(dimapath)
+
+        full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey").drop_duplicates(["LineKey", "RecKey"], ignore_index=True)
+
+        # if 'PlotKey_x' in full_join.columns:
+        #     full_join.drop(['PlotKey_x'], axis=1, inplace=True)
+        #     full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
         final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
 
         return final_df
@@ -268,6 +264,7 @@ def header_detail(formdate_dictionary, dimapath):
             # this conditional handles dimas with missing details table
             if detail.shape[0]>1:
                 df = pd.merge(header,detail, how="inner", on="RecKey")
+                # df = header
                 return df
             else:
                 return header

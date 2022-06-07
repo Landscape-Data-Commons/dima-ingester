@@ -102,37 +102,14 @@ def pk_appender_bsne(dimapath, date_range):
     return final_df
 
 def pk_appender_soil(dimapath, date_range, tablename = None):
-    """ create header/detail dataframe with the new formdate,
-    then return a dataframe with a primary key made from
-    plotkey + formdate
-
-    works for plots, lines
-    """
-    arc = arcno() # to use calculatefield and get primarykey
+    arc = arcno()
 
     soilpk = soil_pits_raw(dimapath)
-    tables_with_formdate = form_date_check(dimapath) # returns dictionary
-    tables_with_formdate = formdate_correction(tables_with_formdate, tablename)
+    new_formdate_df = new_form_date(soilpk, date_range)
+    new_formdate_df.DateRecordedPK = new_formdate_df.DateRecordedPK.apply(lambda x: pd.Timestamp(x).date())
 
-    header_detail_df = header_detail(tables_with_formdate, dimapath) # returns
-                       # dataframe with old formdate
-
-    # introduced line+plots to help associate soil tables to headers/details
-    line_plot = get_plotkeys(dimapath)
-
-    header_detail_df = pd.merge(header_detail_df, line_plot, how="inner", on="LineKey")
-
-    #######
-    new_formdate_df = new_form_date(header_detail_df, date_range) # returns
-                      # dataframe with new formdate range
-
-    if 'PlotKey_x' in new_formdate_df.columns:
-        new_formdate_df.drop(['PlotKey_x'], axis=1, inplace=True)
-        new_formdate_df.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
-    full_join = pd.merge(new_formdate_df, soilpk, how="inner", on="PlotKey")
-    final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
-
-    return final_df.filter(["HorizonKey","PlotKey", "PrimaryKey"])
+    final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "DateRecordedPK")
+    return final_df
 
 def soil_pits_raw(dimapath):
     logging.info("Creating raw table from soilpits and soilpithorizons..")

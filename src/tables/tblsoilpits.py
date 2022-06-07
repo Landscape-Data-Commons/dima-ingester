@@ -6,7 +6,7 @@ import logging
 
 class SoilPits:
     _table_name = "tblSoilPits"
-    _join_key = "PlotKey"
+    # _join_key = "PlotKey"
 
     def __init__(self, dimapath, pk_formdate_range):
         self._dimapath = dimapath
@@ -28,8 +28,7 @@ class SoilPits:
         else:
             self.pk_source = pk_appender_soil(
                 self._dimapath,
-                custom_daterange,
-                self._table_name).drop_duplicates(ignore_index=True)
+                custom_daterange).drop_duplicates(["PlotKey", "SoilKey"])
 
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
@@ -40,8 +39,10 @@ class SoilPits:
             return pd.merge(
                 self.raw_table,
                 self.pk_source,
+                how="left",
                 suffixes=(None, '_y'),
-                how="inner", on=self._join_key)[cols]
+                left_on=["SoilKey", "PlotKey"],
+                right_on=["SoilKey", "PlotKey"])[cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

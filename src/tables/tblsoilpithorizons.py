@@ -6,7 +6,7 @@ import logging
 
 class SoilPitHorizons:
     _table_name = "tblSoilPitHorizons"
-    _join_key = "HorizonKey"
+    # _join_key = "HorizonKey"
 
     def __init__(self, dimapath, pk_formdate_range):
         self._dimapath = dimapath
@@ -27,8 +27,7 @@ class SoilPitHorizons:
         else:
             self.pk_source = pk_appender_soil(
                 self._dimapath,
-                custom_daterange,
-                self._table_name).drop_duplicates(ignore_index=True)
+                custom_daterange).drop_duplicates(["PlotKey", "HorizonKey"])
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')
@@ -38,8 +37,10 @@ class SoilPitHorizons:
             return pd.merge(
                 self.raw_table,
                 self.pk_source,
+                how="left",
                 suffixes=(None, '_y'),
-                how="inner", on=self._join_key)[cols]
+                left_on=["HorizonKey", "SoilKey"],
+                right_on=["HorizonKey", "SoilKey"])[cols]
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

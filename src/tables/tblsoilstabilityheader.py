@@ -7,7 +7,7 @@ import logging
 
 class SoilStabilityHeader:
     _table_name = "tblSoilStabHeader"
-    _join_key = "LineKey"
+    # _join_key = "LineKey"
 
     def __init__(self, dimapath, pk_formdate_range):
         self._dimapath = dimapath
@@ -23,7 +23,9 @@ class SoilStabilityHeader:
         # primary key flow
         self.pk_source = pk_appender(
             self._dimapath,
-            custom_daterange).drop_duplicates(ignore_index=True)
+            custom_daterange,
+            self._table_name).drop_duplicates(ignore_index=True)
+            
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')
 
@@ -33,7 +35,10 @@ class SoilStabilityHeader:
                 self.raw_table,
                 self.pk_source,
                 suffixes=(None, '_y'),
-                how="inner", on=self._join_key)[cols]
+                how="left",
+                left_on=["PlotKey","RecKey"],
+                right_on=["PlotKey","RecKey"]
+            )[cols].drop_duplicates(["PlotKey", "RecKey"])
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

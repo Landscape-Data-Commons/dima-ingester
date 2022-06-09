@@ -7,7 +7,7 @@ import logging
 
 class Lines:
     _table_name = "tblLines"
-    _join_key = "PlotKey"
+    _join_key = "LineKey"
 
     def __init__(self, dimapath, pk_formdate_range):
 
@@ -28,7 +28,8 @@ class Lines:
         else:
             self.pk_source = pk_appender(
                 self._dimapath,
-                custom_daterange).drop_duplicates(ignore_index=True)
+                custom_daterange,
+                self._table_name).drop_duplicates(ignore_index=True)
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')

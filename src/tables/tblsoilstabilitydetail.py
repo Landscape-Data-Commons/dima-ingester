@@ -11,6 +11,7 @@ class SoilStabilityDetail:
 
     def __init__(self, dimapath, pk_formdate_range):
         self._dimapath = dimapath
+        
         logging.info(f"Extracting the {self._table_name} from the dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
         logging.info(f"Appending primary key to the {self._table_name}..")
@@ -22,7 +23,8 @@ class SoilStabilityDetail:
         # primary key flow
         self.pk_source = pk_appender(
             self._dimapath,
-            custom_daterange).drop_duplicates(ignore_index=True)
+            custom_daterange,
+            self._table_name).drop_duplicates(ignore_index=True)
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')

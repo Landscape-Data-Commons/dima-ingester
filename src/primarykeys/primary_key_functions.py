@@ -28,7 +28,8 @@ def pk_appender(dimapath, date_range, tablename = None):
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
 
     #
-    if (tablename is not None) and ("tblLines" not in tablename or "tblPlots" not in tablename) :
+    # if (tablename is not None) and ("tblLines" not in tablename or "tblPlots" not in tablename) :
+    if (tablename is not None):
         tables_with_formdate= formdate_correction(tables_with_formdate, tablename)
 
 
@@ -41,7 +42,12 @@ def pk_appender(dimapath, date_range, tablename = None):
 
         line_plot = get_plotkeys(dimapath)
 
-        full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey").drop_duplicates(["LineKey", "RecKey"], ignore_index=True)
+        if "SoilStab" in tablename or "DK" in tablename or "Infiltration" in tablename:
+            full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="PlotKey").drop_duplicates(["PlotKey", "RecKey"], ignore_index=True)
+        elif "Plots" in tablename:
+            full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey").drop_duplicates(["PlotKey", "RecKey"],ignore_index=True)
+        else:
+            full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey").drop_duplicates(["LineKey", "RecKey"], ignore_index=True)
 
         # if 'PlotKey_x' in full_join.columns:
         #     full_join.drop(['PlotKey_x'], axis=1, inplace=True)
@@ -66,6 +72,10 @@ def formdate_correction(obj, tablename = None):
     elif "SpecRichDetail" in tablename:
         st = f"{tablename}".split('Detail')[0]
     elif "SoilPit" in tablename:
+        st = "tblLPIHeader"
+    elif "tblLines" in tablename:
+        st = "tblLPIHeader"
+    elif "Plots" in tablename or "Lines" in tablename:
         st = "tblLPIHeader"
     for i in obj_copy.keys():
         if obj_copy[i] is True:

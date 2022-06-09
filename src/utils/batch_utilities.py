@@ -14,7 +14,8 @@ from src.tables import (
     PlantProdHeader, PlantProdDetail, PlotHistory,
     PlantDenDetail, PlantDenHeader, PlantDenQuads,
     PlantDenSpecies, SpecRichDetail, SpecRichHeader,
-    PlotNotes
+    PlotNotes, DKHeader, DKDetail, InfiltrationDetail, InfiltrationHeader,
+    ESDRockFragments
     )
 
 def table_operations(tablename, dimapath, pk_formdate_range):
@@ -130,6 +131,26 @@ def table_operations(tablename, dimapath, pk_formdate_range):
         "tblSoilStabDetail":{
             "db_name": "tblSoilStabDetail",
             "operation": lambda: SoilStabilityDetail(dimapath, pk_formdate_range).final_df
+        },
+        "tblESDRockFragments":{
+            "db_name": "tblESDRockFragments",
+            "operation": lambda: ESDRockFragments(dimapath).final_df
+        },
+        "tblDKHeader":{
+            "db_name": "tblDKHeader",
+            "operation": lambda: DKHeader(dimapath, pk_formdate_range).final_df
+        },
+        "tblDKDetail":{
+            "db_name": "tblDKDetail",
+            "operation": lambda: DKDetail(dimapath, pk_formdate_range).final_df
+        },
+        "tblInfiltrationHeader":{
+            "db_name": "tblInfiltrationHeader",
+            "operation": lambda: InfiltrationHeader(dimapath, pk_formdate_range).final_df
+        },
+        "tblInfiltrationDetail":{
+            "db_name": "tblInfiltrationDetail",
+            "operation": lambda: InfiltrationDetail(dimapath, pk_formdate_range).final_df
         },
     }
     return table_handling.get(tablename)

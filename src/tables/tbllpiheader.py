@@ -22,8 +22,7 @@ class LPIHeader:
         # primary key flow
         self.pk_source = pk_appender(
             self._dimapath,
-            custom_daterange,
-            self._table_name).drop_duplicates(ignore_index=True)
+            custom_daterange).drop_duplicates(ignore_index=True)
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')
@@ -34,7 +33,10 @@ class LPIHeader:
                 self.raw_table,
                 self.pk_source,
                 suffixes=(None, '_y'),
-                how="inner", on=self._join_key)[cols]
+                how="left",
+                left_on=["LineKey","RecKey"],
+                right_on=["LineKey","RecKey"]
+            )[cols].drop_duplicates(["LineKey", "RecKey"])
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

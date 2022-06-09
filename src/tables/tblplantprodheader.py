@@ -34,7 +34,10 @@ class PlantProdHeader:
                 self.raw_table,
                 self.pk_source,
                 suffixes=(None, '_y'),
-                how="inner", on=self._join_key)[cols]
+                how="left",
+                left_on=["LineKey","RecKey"],
+                right_on=["LineKey","RecKey"]
+            )[cols].drop_duplicates(["LineKey", "RecKey"])
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

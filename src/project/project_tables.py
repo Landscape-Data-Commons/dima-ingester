@@ -14,5 +14,6 @@ fields_dict = {
 "project_key":pd.Series([],dtype='object'),
 "project_name":pd.Series([],dtype='object'),
 "project_description":pd.Series([],dtype='object'),
-"project_website":pd.Series([],dtype='object')
+"project_website":pd.Series([],dtype='object'),
+"data_use_agreement":pd.Series([],dtype='object')
 }

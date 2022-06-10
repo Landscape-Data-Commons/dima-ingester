@@ -20,14 +20,15 @@ def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
 
     table_fields = {}
 
+
     try:
 
         for i in df.columns:
             if tablename!='aero_runs':
                 if ("dima" in conn) or ("dimadev" in conn):
 
-                    # print("dima or dimadev")
                     table_fields.update({f'{i}':f'{tablefields[possible_tables[tablename]][i]}'})
+
                 else:
                     print("other schemas")
                     table_fields.update({f'{i}':f'{type_translate[df.dtypes[i].name]}'})
@@ -400,7 +401,12 @@ possible_tables = {
     "tblPlotNotes":"tblPlotNotes",
     "tblQualDetail":"tblQualDetail",
     "tblQualHeader":"tblQualHeader",
-    "schemaTable":"schemaTable"
+    "schemaTable":"schemaTable",
+    "tblDKHeader":"tblDKHeader",
+    "tblDKDetail":"tblDKDetail",
+    "tblInfiltrationHeader":"tblInfiltrationHeader",
+    "tblInfiltrationDetail":"tblInfiltrationDetail",
+    "tblESDRockFragments":"tblESDRockFragments"
 }
 
 def engine_conn_string(string):

@@ -22,7 +22,8 @@ class LPIHeader:
         # primary key flow
         self.pk_source = pk_appender(
             self._dimapath,
-            custom_daterange).drop_duplicates(ignore_index=True)
+            custom_daterange,
+            self._table_name).drop_duplicates(ignore_index=True)
 
         cols = [i for i in self.raw_table.columns if '_x' not in i and '_y' not in i]
         cols.append('PrimaryKey')

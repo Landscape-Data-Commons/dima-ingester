@@ -52,6 +52,7 @@ def pk_appender(dimapath, date_range, tablename = None):
         # if 'PlotKey_x' in full_join.columns:
         #     full_join.drop(['PlotKey_x'], axis=1, inplace=True)
         #     full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+        full_join["FormDatePK"] = full_join.FormDatePK.apply(lambda x: pd.Timestamp(x).date())
         final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
 
         return final_df
@@ -103,6 +104,7 @@ def pk_appender_bsne(dimapath, date_range):
     if 'PlotKey_x' in new_formdate_df.columns:
         new_formdate_df.drop(['PlotKey_x'], axis=1, inplace=True)
         new_formdate_df.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+    new_formdate_df["collectDatePK"] = new_formdate_df.collectDatePK.apply(lambda x: pd.Timestamp(x).date())
     final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "collectDatePK")
 
     return final_df

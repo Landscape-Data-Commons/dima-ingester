@@ -41,7 +41,10 @@ class Ingester:
 
                 chunk.to_csv(f, index=False, header=False, sep='\t', na_rep='\\N', quoting=None)
                 f.seek(0)
-                cursor.copy_from(f, f'"{table}"', columns=[f'"{i}"' for i in df.columns])
+                tablecols = [f'"{i}"' for i in df.columns]
+                ### ADDING AUTOINCREMENT SERIAL
+                # tablecols.append("rid")
+                cursor.copy_from(f, f'"{table}"', columns=tablecols)
                 connection.commit()
         except psycopg2.Error as e:
             print(e)

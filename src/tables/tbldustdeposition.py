@@ -33,7 +33,10 @@ class DustDeposition:
                 self.raw_table,
                 self.pk_source,
                 suffixes=(None, '_y'),
-                how="inner", on=self._join_key)[cols]
+                how="left",
+                left_on=["StackID","collectDate"],
+                right_on=["StackID","collectDate"]
+            )[cols].drop_duplicates(["StackID","RecKey"], ignore_index=True)
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])
 

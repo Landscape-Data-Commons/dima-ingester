@@ -40,6 +40,8 @@ def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
 
         if table_fields:
             print("checking fields")
+            ### ADDDING SERIAl FIELD HERE AND WHERE THE COPY_FROM FUNCTION IS
+            table_fields.update({"rid":"serial PRIMARY KEY"})
             comm = sql_command(table_fields, tablename, conn) if conn!='nri' else sql_command(table_fields, tablename, 'nritest')
             d = db(f'{conn}')
             con = d.str

@@ -35,8 +35,8 @@ class HorizontalFlux:
                 self.pk_source,
                 suffixes=(None, '_y'),
                 how="left",
-                left_on=["BoxID","StackID"],
-                right_on=["BoxID","StackID"]
+                left_on=["BoxID","StackID","collectDate"],
+                right_on=["BoxID","StackID","collectDate"]
             )[cols].drop_duplicates(["BoxID","StackID","RecKey"], ignore_index=True)
         else:
             return pd.DataFrame(columns=[i for i in self.raw_table.columns])

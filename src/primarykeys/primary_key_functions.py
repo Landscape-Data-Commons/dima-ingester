@@ -239,9 +239,8 @@ def new_form_date(old_formdate_dataframe, window_size):
         logging.error("no usable daterange field found in dataframe!")
     finally:
 
-        old_formdate_dataframe[which_field] = old_formdate_dataframe[whichfield].apply(
-            lambda x: date_grp(x, old_formdate_dataframe,int(window_size)),
-            axis=1
+        old_formdate_dataframe[which_field] = old_formdate_dataframe[which_field_original].apply(
+            lambda x: date_grp(x, old_formdate_dataframe,int(window_size))
         )
         logging.info("dataframe with custom daterange done.")
         return old_formdate_dataframe

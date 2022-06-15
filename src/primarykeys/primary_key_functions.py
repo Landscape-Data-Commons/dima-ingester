@@ -203,7 +203,7 @@ def date_grp(target_date, formdate_df, window_size):
 
             start=pd.to_datetime(i)-timedelta(days=window_size)
             end=pd.to_datetime(i)+timedelta(days=window_size)
-            if start<=target_date<=end:
+            if start<=target_date_ts<=end:
                 return i
             else:
                 pass

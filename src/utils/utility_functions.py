@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+import time
+import logging
 from psycopg2 import sql
 import numpy as np
 
@@ -419,7 +421,60 @@ def engine_conn_string(string):
 
 
 
+class TimerError(Exception):
+    """A custom exception used to report errors in use of Timer class"""
 
+class Timer:
+    def __init__(
+        self,
+        location=None,
+        text="Elapsed time: {:0.4f} seconds",
+        logger=print
+    ):
+        self._start_time = None
+
+        self.loc = location
+        if self.loc!=None:
+            self.text = f"loc: {self.loc} >>> {text}"
+        else:
+            self.text = text
+        self.logger = logging.info
+        
+    def __call__(self, func):
+        """Support using Timer as a decorator"""
+        @functools.wraps(func)
+        def wrapper_timer(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+
+        return wrapper_timer
+
+    def __enter__(self):
+        """Start a new timer as a context manager"""
+        self.start()
+        return self
+
+    def __exit__(self, *exc_info):
+        """Stop the context manager timer"""
+        self.stop()
+
+    def start(self):
+        """Start a new timer"""
+        if self._start_time is not None:
+            raise TimerError(f"Timer is running. Use .stop() to stop it")
+
+        self._start_time = time.perf_counter()
+
+    def stop(self):
+        """Stop the timer, and report the elapsed time"""
+        if self._start_time is None:
+            raise TimerError(f"Timer is not running. Use .start() to start it")
+
+        elapsed_time = time.perf_counter() - self._start_time
+        self._start_time = None
+
+        if self.logger:
+            self.logger(self.text.format(elapsed_time))
 
 
 

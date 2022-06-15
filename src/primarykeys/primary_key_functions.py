@@ -199,41 +199,23 @@ def date_grp(target_date, formdate_df, window_size):
         logging.error(e)
 
     finally:
-        # changed logic if-else logic to handle non-iterable
-        # dateranges ( ranges smaller than 2 entries )
-        # date_range = pd.date_range(start=mindate, end=maxdate, freq=f'{date_spread}D')
-        # date_range = pd.date_range(start=lst.min(), end=lst.max(), freq=f'{date_spread}D')
-        # if len(date_range)<2:
-        #     return date_range[0]
-        # else:
-        #     for i in range(0,len(date_range.tolist())-1):
-        #         if date_range[i] <= target_date_ts < date_range[i+1]:
-        #             return date_range[i]
-        #
-        #         elif target_date_ts>= date_range.max():
-        #             # if target date is outside of daterange, return last index
-        #             return date_range[date_range.tolist().index(date_range.max())]
-        #
-        #         else:
-        #             pass
-        # initlist = df.FormDate.unique()
         for i in lst:
-            rng = pd.date_range(
-                    start=pd.to_datetime(i)-timedelta(days=window_size),
-                    end=pd.to_datetime(i)+timedelta(days=window_size),
-                    freq=f'{2*window_size}D')
-            if within(target_date,rng):
+
+            start=pd.to_datetime(i)-timedelta(days=window_size)
+            end=pd.to_datetime(i)+timedelta(days=window_size)
+            if start<=target_date<=end:
                 return i
             else:
                 pass
 
-def within(date, range):
-    start = range[0]
-    end =  range[len(range)-1]
-    if start<= pd.to_datetime(date) <=end:
-        return True
-    else:
-        return False
+
+# def within(date, range):
+#     start = range[0]
+#     end =  range[len(range)-1]
+#     if start<= pd.to_datetime(date) <=end:
+#         return True
+#     else:
+#         return False
 
 def new_form_date(old_formdate_dataframe, window_size):
     """ given a dataframe with a formdate field,

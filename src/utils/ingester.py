@@ -5,6 +5,8 @@ import re
 import os, os.path
 import pandas as pd
 import logging
+from src.utils.database_functions import db
+
 
 class Ingester:
 
@@ -19,8 +21,9 @@ class Ingester:
         self.cur = self.con.cursor()
 
     @staticmethod
-    def main_ingest( df: pd.DataFrame, table:str,
-                    connection: psycopg2.extensions.connection,
+    def main_ingest( df: pd.DataFrame,
+                    table:str,
+                    connection: str,
                     chunk_size:int = 10000):
         """needs a table first"""
 
@@ -33,7 +36,10 @@ class Ingester:
                     df[col] = df[col].apply(lambda x: x.replace(v, '') if (x is not None) and (isinstance(x,str)) else x)
         try:
             logging.info(f"{table}: {df.columns}")
-            conn = connection
+
+            conn = db(connection).str
+            conn.autocommit = False
+
             cursor = conn.cursor()
             for i in tqdm(range(0, df.shape[0], chunk_size)):
                 f = StringIO()
@@ -45,10 +51,16 @@ class Ingester:
                 ### ADDING AUTOINCREMENT SERIAL
                 # tablecols.append("rid")
                 cursor.copy_from(f, f'"{table}"', columns=tablecols)
-                connection.commit()
+                conn.commit()
+
         except psycopg2.Error as e:
             print(e)
-            conn = connection
+            conn = db(connection).str
             cursor = conn.cursor()
             conn.rollback()
-        cursor.close()
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+            logging.info("PG db connection is closed.")

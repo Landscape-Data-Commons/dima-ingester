@@ -4,6 +4,8 @@ import time
 import logging
 from psycopg2 import sql
 import numpy as np
+import functools
+
 
 from src.utils.database_functions import db, arcno
 from src.utils.tablefields import tablefields
@@ -428,7 +430,7 @@ class Timer:
     def __init__(
         self,
         location=None,
-        text="Elapsed time: {:0.4f} seconds",
+        text="Elapsed time: {:0.4f} minutes",
         logger=print
     ):
         self._start_time = None
@@ -439,7 +441,7 @@ class Timer:
         else:
             self.text = text
         self.logger = logging.info
-        
+
     def __call__(self, func):
         """Support using Timer as a decorator"""
         @functools.wraps(func)
@@ -474,7 +476,7 @@ class Timer:
         self._start_time = None
 
         if self.logger:
-            self.logger(self.text.format(elapsed_time))
+            self.logger(self.text.format(elapsed_time/60))
 
 
 

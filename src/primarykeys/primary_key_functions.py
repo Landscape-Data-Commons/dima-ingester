@@ -1,4 +1,5 @@
 from src.utils.database_functions import arcno
+from src.utils.utility_functions import Timer
 import pandas as pd
 import re
 import logging
@@ -16,7 +17,7 @@ Primary key strategy:
 """
 
 
-
+@Timer(location="*** pk_appender ***")
 def pk_appender(dimapath, date_range, tablename = None):
     """ create header/detail dataframe with the new formdate,
     then return a dataframe with a primary key made from
@@ -25,6 +26,7 @@ def pk_appender(dimapath, date_range, tablename = None):
     works for plots, lines
     """
     arc = arcno()
+
     tables_with_formdate = form_date_check(dimapath) # returns dictionary
 
     #
@@ -87,7 +89,7 @@ def formdate_correction(obj, tablename = None):
         else:
             pass
     return obj_copy
-
+@Timer(location="*** BSNE_appender ***")
 def pk_appender_bsne(dimapath, date_range):
     """ create header/detail dataframe with the new formdate,
     then return a dataframe with a primary key made from
@@ -109,6 +111,7 @@ def pk_appender_bsne(dimapath, date_range):
 
     return final_df
 
+@Timer(location="*** soil_appender ***")
 def pk_appender_soil(dimapath, date_range, tablename = None):
     arc = arcno()
 
@@ -118,7 +121,7 @@ def pk_appender_soil(dimapath, date_range, tablename = None):
 
     final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "DateRecordedPK")
     return final_df
-
+@Timer(location=" *** Soilpits raw ***")
 def soil_pits_raw(dimapath):
     logging.info("Creating raw table from soilpits and soilpithorizons..")
     horizons = arcno.MakeTableView("tblSoilPitHorizons",dimapath)
@@ -136,7 +139,7 @@ def soil_pits_raw(dimapath):
     else:
         # if neither exists
         pass
-
+@Timer(location="*** dust_depo raw ***")
 def dust_deposition_raw(dimapath):
     logging.info("Creating raw table from BSNE tblBSNE_TrapCollection and Stack")
     ddt = arcno.MakeTableView("tblBSNE_TrapCollection",dimapath)
@@ -145,6 +148,7 @@ def dust_deposition_raw(dimapath):
     logging.info("raw bsne table done.")
     return df
 
+@Timer(location="*** horflux raw ***")
 def horizontalflux_raw(dimapath):
     logging.info("Creating raw table from BSNE Box, Box Collection and Stack")
     box = arcno.MakeTableView("tblBSNE_Box",dimapath)
@@ -171,6 +175,7 @@ def form_date_check(dimapath):
         else:
             obj[i] = False
     return obj
+
 
 def date_grp(target_date, formdate_df, window_size):
     """ given a daterange size (date_spread),
@@ -216,7 +221,7 @@ def date_grp(target_date, formdate_df, window_size):
 #         return True
 #     else:
 #         return False
-
+@Timer(location="*** date_grp column ***")
 def new_form_date(old_formdate_dataframe, window_size):
     """ given a dataframe with a formdate field,
     returns a dataframe with a new formdate field with custom daterange classes
@@ -245,6 +250,7 @@ def new_form_date(old_formdate_dataframe, window_size):
         logging.info("dataframe with custom daterange done.")
         return old_formdate_dataframe
 
+@Timer(location="*** pk_appender ***")
 def header_detail(formdate_dictionary, dimapath):
     """ create a header/detail dataframe with with a formdate dataframe
     """
@@ -265,7 +271,7 @@ def header_detail(formdate_dictionary, dimapath):
             pass
 
 
-
+@Timer(location="*** getting plotkeys ***")
 def get_plotkeys(dimapath):
     line = arcno.MakeTableView("tblLines", dimapath)
     plots = arcno.MakeTableView("tblPlots", dimapath)

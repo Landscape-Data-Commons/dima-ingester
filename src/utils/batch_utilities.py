@@ -226,6 +226,9 @@ def batch_looper(dimacontainer, projkey=None, dev='False', pk_formdate_range=Non
     elif dev=='True':
         d = db("dimadev")
         keyword = "dimadev"
+    else:
+        d = db("dimadev")
+        keyword = "dimadev"
 
     tablelist = None
     while tablelist is None:
@@ -242,12 +245,12 @@ def batch_looper(dimacontainer, projkey=None, dev='False', pk_formdate_range=Non
             if tablecheck(tblname, keyword):
                 logging.info(f"table '{table}' found; ingesting..")
 
-                Ingester.main_ingest(df, tblname, d.str, 10000)
+                Ingester.main_ingest(df, tblname, keyword, 10000)
             else:
                 logging.info(f"table '{table}' not found; creating table and ingesting..")
                 table_create(df, tblname, keyword)
 
-                Ingester.main_ingest(df, tblname, d.str, 10000)
+                Ingester.main_ingest(df, tblname, keyword, 10000)
 
 
 

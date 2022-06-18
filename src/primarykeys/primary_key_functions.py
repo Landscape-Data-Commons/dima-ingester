@@ -47,13 +47,17 @@ def pk_appender(dimapath, date_range, tablename = None):
         if "SoilStab" in tablename or "DK" in tablename or "Infiltration" in tablename:
             full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="PlotKey").drop_duplicates(["PlotKey", "RecKey"], ignore_index=True)
         elif "Plots" in tablename:
-            full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey").drop_duplicates(["PlotKey", "RecKey"],ignore_index=True)
+            if "LineKey" in new_formdate_df.columns and "LineKey" in line_plot.columns:
+                full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey")
+            else:
+                full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="PlotKey").drop_duplicates(["PlotKey", "RecKey"],ignore_index=True)
         else:
             full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="LineKey").drop_duplicates(["LineKey", "RecKey"], ignore_index=True)
 
-        # if 'PlotKey_x' in full_join.columns:
-        #     full_join.drop(['PlotKey_x'], axis=1, inplace=True)
-        #     full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+        if 'PlotKey_x' in full_join.columns:
+            full_join.drop(['PlotKey_x'], axis=1, inplace=True)
+            full_join.rename(columns={'PlotKey_y':"PlotKey"}, inplace=True)
+            full_join = full_join.drop_duplicates(["PlotKey", "RecKey"],ignore_index=True)
         full_join["FormDatePK"] = full_join.FormDatePK.apply(lambda x: pd.Timestamp(x).date())
         final_df = arc.CalculateField(full_join,"PrimaryKey", "PlotKey", "FormDatePK")
 
@@ -77,9 +81,16 @@ def formdate_correction(obj, tablename = None):
     elif "SoilPit" in tablename:
         st = "tblLPIHeader"
     elif "tblLines" in tablename:
-        st = "tblLPIHeader"
+        if "tblLPIHeader" in obj_copy.keys():
+            st = "tblLPIHeader"
+        else:
+            st = [i for i in obj_copy.keys() if obj_copy[i]==True][0]
+
     elif "Plots" in tablename or "Lines" in tablename:
-        st = "tblLPIHeader"
+        if "tblLPIHeader" in obj_copy.keys():
+            st = "tblLPIHeader"
+        else:
+            st = [i for i in obj_copy.keys() if obj_copy[i]==True][0]
     for i in obj_copy.keys():
         if obj_copy[i] is True:
             if st in i:
@@ -116,11 +127,16 @@ def pk_appender_soil(dimapath, date_range, tablename = None):
     arc = arcno()
 
     soilpk = soil_pits_raw(dimapath)
+    soilpk = soilpk[~pd.isna(soilpk.DateRecorded)].copy(deep=True)
     new_formdate_df = new_form_date(soilpk, date_range)
-    new_formdate_df.DateRecordedPK = new_formdate_df.DateRecordedPK.apply(lambda x: pd.Timestamp(x).date())
+
+
+    new_formdate_df.DateRecordedPK = new_formdate_df.DateRecorded.apply(lambda x: pd.Timestamp(x).date())
 
     final_df = arc.CalculateField(new_formdate_df,"PrimaryKey", "PlotKey", "DateRecordedPK")
     return final_df
+
+
 @Timer(location=" *** Soilpits raw ***")
 def soil_pits_raw(dimapath):
     logging.info("Creating raw table from soilpits and soilpithorizons..")

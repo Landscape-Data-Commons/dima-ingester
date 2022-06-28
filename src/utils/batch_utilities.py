@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from datetime import datetime
 from src.utils.database_functions import arcno, db
-from src.utils.utility_functions import tablecheck, table_create
+from src.utils.utility_functions import tablecheck, table_create, Timer
 from src.utils.ingester import Ingester
 import logging
 
@@ -209,7 +209,8 @@ def looper(path2mdbs, tablename, projk=None, pk_formdate_range=None):
         return obj
     else:
         logging.info(f"table '{tablename}' not found within this dima batch")
-
+        
+@Timer(location="*** TOTAL DURATION (LOOPING OVER ALL TABLES IN DIMA(s)) ***")
 def batch_looper(dimacontainer, projkey=None, dev='False', pk_formdate_range=None):
 
     """

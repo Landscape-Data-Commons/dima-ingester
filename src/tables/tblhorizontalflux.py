@@ -44,5 +44,5 @@ class HorizontalFlux:
     def tbl_fixes(self, df):
         df = df.loc[:,~df.columns.duplicated()]
         if 'ovenTemp' in df.columns:
-            df.ovenTemp = tbl.ovenTemp.apply(lambda x: pd.NA if pd.isnull(x)==True else x).astype('Int64')
+            df.ovenTemp = df.ovenTemp.apply(lambda x: pd.NA if pd.isnull(x)==True else x).astype('Int64')
         return df

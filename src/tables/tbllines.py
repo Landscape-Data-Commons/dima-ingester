@@ -44,15 +44,15 @@ class Lines:
 
         if self.pk_source is not None:
             # return pd.concat([self.raw_table, self.pk_source.loc[:,[self._join_key,'PrimaryKey']]],axis=1, join="inner").loc[:,cols]
-
+            linekeyfix = self.missing_linekey_fix(self.pk_source)
             missingpks=  pd.merge(
                             self.raw_table,
                             self.pk_source,
                             suffixes=(None, '_y'),
                             how="left",
-                            left_on=["LineKey", "PlotKey"],
-                            right_on=["LineKey","PlotKey"]
-                        )[cols].drop_duplicates(["LineKey"],
+                            left_on = linekeyfix['leftright'],
+                            right_on = linekeyfix['leftright']
+                        )[cols].drop_duplicates( linekeyfix['dropdups'],
                                                 ignore_index=True)
 
             return missingpks[~pd.isna(missingpks.PrimaryKey)]
@@ -69,7 +69,15 @@ class Lines:
                 return df
         return df
 
-
+    def missing_linekey_fix(df):
+        obj = {}
+        if 'PlotKey' in df.columns and 'LineKey' in df.columns:
+            obj['leftright']= ['PlotKey', "LineKey"]
+            obj['dropdups'] = ['LineKey']
+        elif 'PlotKey' in df.columns and 'LineKey' not in df.columns:
+            obj['leftright'] = ["PlotKey"]
+            obj['dropdups'] = ['PlotKey']
+        return obj
 
 
 

@@ -69,7 +69,7 @@ class Lines:
                 return df
         return df
 
-    def missing_linekey_fix(df):
+    def missing_linekey_fix(self, df):
         obj = {}
         if 'PlotKey' in df.columns and 'LineKey' in df.columns:
             obj['leftright']= ['PlotKey', "LineKey"]

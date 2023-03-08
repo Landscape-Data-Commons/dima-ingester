@@ -143,6 +143,7 @@ tablefields= {
         "PrimaryKey":"text",
         "DateLoadedInDB":"timestamp",
         "DBKey":"text",
+        "plotVisitKey":"text",
     },
 
     "tblLPIHeader":{
@@ -209,7 +210,8 @@ tablefields= {
          'PrimaryKey':"text",
          'DateLoadedInDB':"timestamp",
          'DBKey':"text",
-         'EveryNth_num':"text"
+         'EveryNth_num':"text",
+         "plotVisitKey":"text",
     },
     "tblLPIDetail":{
          'RecKey':"varchar(50)",
@@ -865,7 +867,8 @@ tablefields= {
          'SoilStabLimitedVeg':"boolean",
          'PrimaryKey':"text",
          'DateLoadedInDB':"timestamp",
-         'DBKey':"text"
+         'DBKey':"text",
+         "plotVisitKey":"text",
     },
     "tblPlantDenHeader":{
          'LineKey':"varchar(50)",
@@ -906,7 +909,8 @@ tablefields= {
          'SpeciesSearchedFor':"varchar(50)",
          'PrimaryKey':"text",
          'DateLoadedInDB':"timestamp",
-         'DBKey':"text"
+         'DBKey':"text",
+         "plotVisitKey":"text",
     },
     "tblPlantDenDetail":{
          'RecKey':"varchar(50)",
@@ -1034,6 +1038,7 @@ tablefields= {
          'PrimaryKey':"text",
          'DateLoadedInDB':"timestamp",
          'DBKey':"text",
+         "plotVisitKey":"text",
     },
     "tblPlantProdDetail":{
      'RecKey':"varchar(50)",
@@ -1166,6 +1171,7 @@ tablefields= {
          'PrimaryKey':"text",
          'DateLoadedInDB':"timestamp",
          'DBKey':"text",
+         "plotVisitKey":"text",
     },
     "tblSpecRichDetail":{
          'RecKey':"varchar(50)",

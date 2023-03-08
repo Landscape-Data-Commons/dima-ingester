@@ -201,10 +201,11 @@ def date_grp(target_date, formdate_df, window_size):
     return which custom date class it belongs to.
     """
     # logging.info("gathering dates from table..")
+
     if isinstance(target_date,str):
         target_date_ts = datetime.strptime(target_date, '%Y-%m-%d %H:%M:%S')
     else:
-        target_date_ts = target_date.to_pydatetime().date()
+        target_date_ts = target_date.date()
     try:
 
         if "FormDate" in formdate_df.columns:

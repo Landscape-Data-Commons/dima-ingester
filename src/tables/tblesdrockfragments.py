@@ -11,7 +11,7 @@ class ESDRockFragments:
 
     def __init__(self, dimapath):
         self._dimapath = dimapath
-        logging.info(f"Extracting the {self._table_name} from the dimafile..")
+        logging.info(f"extracting the {self._table_name} from the {os.path.basename(self._dimapath).replace(' ','')} dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
         logging.info(f"Appending primary key to the {self._table_name}..")
         self.table_pk = self.removables(self.raw_table)

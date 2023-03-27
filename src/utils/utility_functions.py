@@ -23,7 +23,18 @@ def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
     """
 
     table_fields = {}
+    """
+    in order to never end up creating a table in postgres with less fields
+    than expected (in case a dima version has an older table schema with less
+    columns in their specification), a baseline schema is established from
+    src.utils.tablefields. fields are added to this baseline table.
 
+    what could happen: dima table is created in postgres with 1 additional new
+    field, and subsequent ingests that don't have the field fail to ingest. in
+    that case, the table is pulled from pg and used as a model for the pg table
+    (not yet implemented)
+    """
+    table_fields = tablefields[possible_tables[tablename]].copy()
 
     try:
 
@@ -31,7 +42,11 @@ def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
             if tablename!='aero_runs':
                 if ("dima" in conn) or ("dimadev" in conn):
 
-                    table_fields.update({f'{i}':f'{tablefields[possible_tables[tablename]][i]}'})
+                    # table_fields.update({f'{i}':f'{tablefields[possible_tables[tablename]][i]}'})
+                    if i not in tablefields[possible_tables[tablename]].keys():
+                        table_fields.update({f'{i}':f'{type_translate[tbl3.dtypes[i]]}'})
+                    else:
+                        pass
 
                 else:
                     print("other schemas")
@@ -60,6 +75,14 @@ def table_create(df: pd.DataFrame, tablename: str, conn:str=None):
         con = d.str
         cur = con.cursor()
 
+type_translate = {
+    np.dtype('int64'):'int',
+    'Int64':'int',
+    np.dtype("object"):'text',
+    np.dtype('datetime64[ns]'):'timestamp',
+    np.dtype('bool'):'boolean',
+    np.dtype('float64'):'double precision',
+    }
 
 def table_fields(df, tablename):
     table_fields = {}

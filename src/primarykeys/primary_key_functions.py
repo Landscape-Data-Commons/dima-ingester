@@ -279,7 +279,7 @@ def header_detail(formdate_dictionary, dimapath):
             detail = arcno.MakeTableView(f'tbl{simple_table_name}Detail', dimapath)
             # this conditional handles dimas with missing details table
             if detail.shape[0]>1:
-                df = pd.merge(header,detail, how="inner", on="RecKey")
+                df = pd.merge(header,detail, how="outer", on="RecKey")
                 # df = header
                 return df
             else:

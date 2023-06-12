@@ -435,7 +435,9 @@ possible_tables = {
     "tblDKDetail":"tblDKDetail",
     "tblInfiltrationHeader":"tblInfiltrationHeader",
     "tblInfiltrationDetail":"tblInfiltrationDetail",
-    "tblESDRockFragments":"tblESDRockFragments"
+    "tblESDRockFragments":"tblESDRockFragments",
+    "tblTreeDenHeader":"tblTreeDenHeader",
+    "tblTreeDenDetail":"tblTreeDenDetail"
 }
 
 def engine_conn_string(string):

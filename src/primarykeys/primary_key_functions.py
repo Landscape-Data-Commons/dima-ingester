@@ -44,7 +44,7 @@ def pk_appender(dimapath, date_range, tablename = None):
 
         line_plot = get_plotkeys(dimapath)
 
-        if "SoilStab" in tablename or "DK" in tablename or "Infiltration" in tablename:
+        if "SoilStab" in tablename or "DK" in tablename or "Infiltration" or "TreeDen" in tablename:
             full_join = pd.merge(new_formdate_df, line_plot, how="inner", on="PlotKey").drop_duplicates(["PlotKey", "RecKey"], ignore_index=True)
         elif "Plots" in tablename:
             if "LineKey" in new_formdate_df.columns and "LineKey" in line_plot.columns:

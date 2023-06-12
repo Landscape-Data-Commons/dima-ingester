@@ -15,7 +15,7 @@ from src.tables import (
     PlantDenDetail, PlantDenHeader, PlantDenQuads,
     PlantDenSpecies, SpecRichDetail, SpecRichHeader,
     PlotNotes, DKHeader, DKDetail, InfiltrationDetail, InfiltrationHeader,
-    ESDRockFragments
+    ESDRockFragments, TreeDenHeader, TreeDenDetail
     )
 
 def table_operations(tablename, dimapath, pk_formdate_range):
@@ -152,6 +152,14 @@ def table_operations(tablename, dimapath, pk_formdate_range):
             "db_name": "tblInfiltrationDetail",
             "operation": lambda: InfiltrationDetail(dimapath, pk_formdate_range).final_df
         },
+        "tblTreeDenHeader":{
+            "db_name": "tblTreeDenHeader",
+            "operation": lambda: TreeDenHeader(dimapath, pk_formdate_range).final_df
+        },
+        "tblTreeDenDetail":{
+            "db_name": "tblTreeDenDetail",
+            "operation": lambda: TreeDenDetail(dimapath, pk_formdate_range).final_df
+        },
     }
     return table_handling.get(tablename)
 
@@ -209,7 +217,7 @@ def looper(path2mdbs, tablename, projk=None, pk_formdate_range=None):
         return obj
     else:
         logging.info(f"table '{tablename}' not found within this dima batch")
-        
+
 @Timer(location="*** TOTAL DURATION (LOOPING OVER ALL TABLES IN DIMA(s)) ***")
 def batch_looper(dimacontainer, projkey=None, dev='False', pk_formdate_range=None):
 

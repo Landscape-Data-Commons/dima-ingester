@@ -28,6 +28,8 @@ from src.tables.tbldkdetail import DKDetail
 from src.tables.tblinfiltrationheader import InfiltrationHeader
 from src.tables.tblinfiltrationdetail import InfiltrationDetail
 from src.tables.tblesdrockfragments import ESDRockFragments
+from src.tables.tbltreedenheader import TreeDenHeader
+from src.tables.tbltreedendetail import TreeDenDetail
 
 __all__ = [
 "Lines", "Plots", "LPIHeader","LPIDetail", "GapDetail", "GapHeader", "SoilStabilityHeader",
@@ -35,5 +37,6 @@ __all__ = [
 "SoilPitHorizons", "Sites", "Species", "SpeciesGeneric", "PlantProdHeader",
 "PlantProdDetail", "PlotHistory", "PlantDenDetail", "PlantDenHeader", "PlantDenQuads",
 "PlantDenSpecies", "SpecRichHeader", "SpecRichDetail", "PlotNotes", "DKHeader",
-"DKDetail", "InfiltrationHeader", "InfiltrationDetail", "ESDRockFragments"
+"DKDetail", "InfiltrationHeader", "InfiltrationDetail", "ESDRockFragments",
+"TreeDenHeader", "TreeDenDetail"
 ]

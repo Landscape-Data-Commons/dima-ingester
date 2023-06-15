@@ -5,7 +5,6 @@ import os
 import pandas as pd
 import logging
 
-
 class Lines:
     _table_name = "tblLines"
     _join_key = "LineKey"
@@ -65,8 +64,10 @@ class Lines:
         if self._join_key in self.raw_table.columns:
             if ("888888888" in df[self._join_key].unique()) or ('999999999' in df[self._join_key].unique()):
                 return df[(df[self._join_key] != "888888888") & (df[self._join_key] != "999999999")]
-            else:
-                return df
+        if "Azimuth" in self.raw_table.columns:
+
+            df.Azimuth = df.Azimuth.apply(lambda x: pd.NA if pd.isna(x) else x).astype("Int64")
+            print(df.Azimuth)
         return df
 
     def missing_linekey_fix(self, df):

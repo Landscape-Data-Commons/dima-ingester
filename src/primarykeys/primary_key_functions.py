@@ -205,6 +205,7 @@ def date_grp(target_date, formdate_df, window_size):
     if isinstance(target_date,str):
         target_date_ts = datetime.strptime(target_date, '%Y-%m-%d %H:%M:%S')
     else:
+
         target_date_ts = target_date.date()
     try:
 
@@ -248,12 +249,15 @@ def new_form_date(old_formdate_dataframe, window_size):
 
     try:
         if "FormDate" in old_formdate_dataframe.columns:
+            old_formdate_dataframe = old_formdate_dataframe[~pd.isna(old_formdate_dataframe.FormDate)].copy()
             which_field = 'FormDatePK'
             which_field_original = 'FormDate'
         elif "collectDate" in old_formdate_dataframe.columns:
+            old_formdate_dataframe = old_formdate_dataframe[~pd.isna(old_formdate_dataframe.collectDate)].copy()
             which_field = 'collectDatePK'
             which_field_original = 'collectDate'
         elif "DateRecorded" in old_formdate_dataframe.columns:
+            old_formdate_dataframe = old_formdate_dataframe[~pd.isna(old_formdate_dataframe.DateRecorded)].copy()
             which_field = "DateRecordedPK"
             which_field_original = "DateRecorded"
 

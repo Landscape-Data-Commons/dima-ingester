@@ -67,7 +67,6 @@ class Lines:
         if "Azimuth" in self.raw_table.columns:
 
             df.Azimuth = df.Azimuth.apply(lambda x: pd.NA if pd.isna(x) else x).astype("Int64")
-            print(df.Azimuth)
         return df
 
     def missing_linekey_fix(self, df):

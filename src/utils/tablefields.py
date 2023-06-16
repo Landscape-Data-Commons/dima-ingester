@@ -1301,7 +1301,7 @@ tablefields= {
     "tblTreeDenHeader":{
         'PlotKey':"varchar(50)",
         'RecKey':"varchar(50)",
-        'DateModified':"",
+        'DateModified':"timestamp",
         'FormType':"varchar(5)",
         'FormDate':"timestamp",
         'Observer':"varchar(50)",

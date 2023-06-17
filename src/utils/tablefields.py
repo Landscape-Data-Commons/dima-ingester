@@ -1302,7 +1302,7 @@ tablefields= {
         'PlotKey':"varchar(50)",
         'RecKey':"varchar(50)",
         'DateModified':"timestamp",
-        'FormType':"varchar(5)",
+        'FormType':"varchar(50)",
         'FormDate':"timestamp",
         'Observer':"varchar(50)",
         'Recorder':"varchar(50)",

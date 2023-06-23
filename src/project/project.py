@@ -57,7 +57,7 @@ def read_template(dir, maindf):
     maindfcopy = maindf.copy()
     maindf.drop(maindf.index,inplace=True)
     for path in os.listdir(dir):
-        if os.path.splitext(path)[1]==".xlsx":
+        if (os.path.splitext(path)[1]==".xlsx") & ('project' in path):
             df = pd.read_excel(os.path.join(dir,path))
 
             data = [i for i in df.Value]

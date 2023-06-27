@@ -843,7 +843,7 @@ tablefields= {
          'PlotKey':"varchar(20)",
          'RecKey':"varchar(50)",
          'DateModified':"timestamp",
-         'FormType':"varchar(5)",
+         'FormType':"varchar(50)",
          'FormDate':"timestamp",
          'LineKey':"varchar(20)",
          'Observer':"varchar(50)",

@@ -1,8 +1,8 @@
 import pyodbc
 from psycopg2 import connect, sql
 import pandas as pd
-from os import chdir, getcwd
-from os.path import abspath, join
+from os import chdir, getcwd, listdir
+from os.path import abspath, join, normpath, splitext, basename
 from configparser import ConfigParser
 from psycopg2.pool import SimpleConnectionPool
 import jaydebeapi
@@ -10,7 +10,7 @@ import platform
 import pyodbc
 import platform
 import warnings
-
+import logging
 
 class arcno():
     __maintablelist = [
@@ -149,6 +149,8 @@ class arcno():
     # tablelist = []
     # actual_list = {}
     isolates = None
+    nodimadict = {}
+    nodimapaths = {}
 
     def __init__(self, whichdima = None, all=False):
         """ Initializes a list of tables in dima accessible on tablelist.
@@ -156,9 +158,11 @@ class arcno():
         arc = arcno(path_to_dima)
         arc.tablelist
         """
+        
         [self.clear(a) for a in dir(self) if not a.startswith('__') and not callable(getattr(self,a))]
         self.whichdima = whichdima
         self.tablelist=[]
+        print("PRE")
         if self.whichdima is not None:
             conn = Acc(f"{self.whichdima}").con if platform.system()=='Windows' else Acc2(f"{self.whichdima}").con
             # conn.setdecoding(pyodbc.SQL_CHAR, encoding="cp1252")
@@ -178,7 +182,16 @@ class arcno():
                 cursor.execute(qry)
                 trick = [i[0] for i in cursor.fetchall()]
                 self.tablelist = [self.correct[i] for i in trick if i in self.correct.keys()]
-
+        else:
+            dpath = normpath(join(getcwd(),"dimas"))
+            dimas = [i for i in listdir(dpath) if splitext(i)[1]=='.mdb']
+            for i in dimas:
+                dimaname = splitext(i)[0].replace(" ","")
+                self.nodimapaths[dimaname] = join(dpath, dimaname)
+                self.nodimadict[dimaname] = [i for i in listdir(join(dpath, dimaname))]
+            print(self.nodimadict)
+            
+           
 
 
         self.actual_list = {}
@@ -192,6 +205,31 @@ class arcno():
                 if self.MakeTableView(i,whichdima).shape[0]>=1:
                     self.actual_list.update({i:f'rows: {self.MakeTableView(i,whichdima).shape[0]}'})
 
+    @staticmethod
+    def MakeTableViewLocal(in_table, index_or_name ):
+        arc =arcno()
+        no_dima_dict = arc.getNoDimaDict()
+        print("chosen index: ", index_or_name)
+        if isinstance(index_or_name, int):
+            dima_csv_path = self.nodimapaths[index_or_name]
+        else:
+            dima_csv_path = self.nodimapaths[index_or_name]
+
+        print("chosen path: ", dima_csv_path)
+        for i in no_dima_dict[index_or_name]:
+            if in_table in i:
+                print("tablepath found")
+                tablepath = i
+                print(tablepath)
+            # else:
+                # print("no tablepath made")
+
+        try: 
+
+            return LocalTable(tablepath, dima_csv_path).temp
+        except Exception as e:
+            print(e)
+
     def clear(self,var):
         if isinstance(var, list):
             var = []
@@ -203,9 +241,10 @@ class arcno():
             var = None
             return var
 
-
+    def getNoDimaDict(self):
+        return self.nodimadict
     @staticmethod
-    def MakeTableView(in_table,whichdima):
+    def MakeColumnsView(in_table,whichdima):
         """ connects to Microsoft Access .mdb file, selects a table
         and copies it to a dataframe.
         ex.
@@ -217,7 +256,33 @@ class arcno():
         # self.whichdima = whichdima
 
         try:
-            return Table(in_table, whichdima).temp
+            return Columns(in_table, whichdima).temp
+        except Exception as e:
+            print(e)
+
+
+    @staticmethod
+    def MakeTableView(in_table,whichdima):
+        local = False
+        if "extracted" in whichdima:
+            local=True
+        else: 
+            local=False
+
+        """ connects to Microsoft Access .mdb file, selects a table
+        and copies it to a dataframe.
+        ex.
+        arc = arcno()
+        arc.MakeTableView('table_name', 'dima_path')
+
+        """
+        # self.in_table = in_table
+        # self.whichdima = whichdima
+        try:
+            if local:
+                return LocalTable(in_table, whichdima).temp
+            else:
+                return Table(in_table, whichdima).temp
         except Exception as e:
             print(e)
 
@@ -351,6 +416,7 @@ class arcno():
 class Table:
     temp=None
     def __init__(self,in_table=None, path=None):
+
         self.path = path
         self.in_table = in_table
         con = Acc(self.path).con if platform.system()=='Windows' else Acc2(f"{self.path}").con
@@ -358,6 +424,40 @@ class Table:
         con.setencoding(encoding='utf-16le') if platform.system()=='Windows' else None
 
         query = f'SELECT * FROM "{self.in_table}"' if platform.system()=='Windows' else f'SELECT * FROM {self.in_table}'
+        # with warnings.catch_warnings():
+        #      warnings.simplefilter('ignore', UserWarning)
+        self.temp = pd.read_sql(query,con)
+
+    def temp(self):
+        return self.temp
+class LocalTable:
+    temp = None
+    basepath = r"/usr/src/dimas"
+    def __init__(self, in_table=None, path=None):
+        self.path = path 
+        self.in_table = in_table 
+        pathID = basename(self.path).split("extracted_")[1]
+        temppath = f"/usr/src/dimas/extracted_{pathID}/"
+        truepath = join(temppath, f"{pathID}-{in_table}.csv")
+        print(truepath)
+
+        self.temp = pd.read_csv(truepath)
+        print(self.temp)
+
+    def temp(self):
+        return self.temp
+
+
+class Columns:
+    temp=None
+    def __init__(self,in_table=None, path=None):
+        self.path = path
+        self.in_table = in_table
+        con = Acc(self.path).con if platform.system()=='Windows' else Acc2(f"{self.path}").con
+
+        con.setencoding(encoding='utf-16le') if platform.system()=='Windows' else None
+
+        query = f'SELECT TOP 1 * FROM "{self.in_table}" LIMIT ' if platform.system()=='Windows' else f'SELECT * FROM {self.in_table}'
         # with warnings.catch_warnings():
         #      warnings.simplefilter('ignore', UserWarning)
         self.temp = pd.read_sql(query,con)
@@ -410,7 +510,7 @@ class Acc2:
         MDB = self.whichdima
         drv_str1 = "net.ucanaccess.jdbc.UcanaccessDriver"
         DRV = '{/out/lib/libmdbodbc.so}' if platform.system()=='Linux' else '{Microsoft Access Driver (*.mdb, *.accdb)}'
-        mdb_string = f'jdbc:ucanaccess://{MDB};newDatabaseVersion=V2010'
+        mdb_string = f'jdbc:ucanaccess://{MDB};newDatabaseVersion=V2010;memory=false'
         # print(mdb_string)
         self.con = jaydebeapi.connect(drv_str1, mdb_string,["",""],classpath)
         # self.con.setdecoding(pyodbc.SQL_CHAR, encoding='utf-8')

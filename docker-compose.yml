@@ -10,5 +10,17 @@ services:
     container_name: ingester
     volumes:
       - ./dimas:/usr/src/dimas
+      # troubleshooting
+      - ./debug3.py:/usr/src/debug3.py
+      - ./src/utils/database_functions.py:/usr/src/src/utils/database_functions.py
+      # new development binds
+      - ./index.py:/src/src/index.py
+      - ./src/utils/new_export.py:/usr/src/src/utils/new_export.py
+      - ./src/utils/export.sh:/usr/src/src/utils/export.sh
+#     networks:
+#       - pg-network
+# networks:
+#   pg-network:
+#     external: true
 # docker-compose build
 # docker-compose run --rm ingester

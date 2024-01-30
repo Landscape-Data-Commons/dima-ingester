@@ -1,5 +1,6 @@
 debug.py
 debug2.py
+debug*.py
 help.py
 
 pseudocode.py
@@ -12,3 +13,4 @@ pseudocode.py
 **/*.ini
 **/*.csv
 **/*.xlsx
+**/extracted_*

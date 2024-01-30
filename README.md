@@ -1,4 +1,4 @@
-## About the ingester
+  ## About the ingester
 
 Command line application to ingest the tabular contents of DIMA files (access databases with an _.mdb_ or _.accdb_ file extension).
 

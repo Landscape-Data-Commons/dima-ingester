@@ -14,7 +14,9 @@ class GapDetail:
         logging.info(f"extracting the {self._table_name} from the {os.path.basename(self._dimapath).replace(' ','')} dimafile..")
         self.raw_table = arcno.MakeTableView(self._table_name, dimapath)
         logging.info(f"Appending primary key to the {self._table_name}..")
+        # testing no formdate
         self.table_pk = self.get_pk(pk_formdate_range)
+        # self.table_pk = self.raw_table
         logging.info("PrimaryKey added.")
         self.final_df = self.tbl_fixes(self.table_pk)
 

@@ -181,6 +181,12 @@ def looper(path2mdbs, tablename, projk=None, pk_formdate_range=None):
     count = 1
     basestring = 'file_'
 
+
+    # if path2mdb has extracted_, go down the csv route
+    # modified looper here
+
+
+
     for i in contained_files:
         if os.path.splitext(os.path.join(containing_folder,i))[1]=='.mdb' or os.path.splitext(os.path.join(containing_folder,i))[1]=='.accdb':
             countup = basestring+str(count)

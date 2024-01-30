@@ -12,7 +12,9 @@ RUN apt-get update && \
             libpq-dev \
             g++ \
             default-jre \
-            bash -y && \
+            # 2024-01-08 added mdbtools
+            mdbtools \
+            bash -y && \ 
             pip3 install --upgrade pip
 
 # prepare environment

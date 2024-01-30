@@ -6,6 +6,7 @@ from src.utils.batch_utilities import batch_looper, table_collector
 from src.utils.report import csv_report
 from src.tables.tbllines import Lines
 from src.utils.batch_utilities import table_operations, looper
+from src.utils.new_export import subTest
 
 logging.basicConfig(format='%(asctime)s | %(levelname)s: %(message)s', level=logging.NOTSET)
 
@@ -17,6 +18,7 @@ class main(Cmd):
         self.prompt = "> "
         self.batch_path = os.path.normpath(os.path.join(os.getcwd(),"dimas"))
         self.dimafiles = [os.path.normpath(f"{self.batch_path}/{i}") for i in os.listdir(self.batch_path)]
+        self.dimacsvs = [os.path.normpath(f"{self.batch_path}/{i}") for i in os.listdir(self.batch_path) if "extracted_" in i]
 
     def do_pgtables(self, args):
         """tables currently in dima database or development database
@@ -33,6 +35,23 @@ class main(Cmd):
 
         else:
             print(f"database '{args}' not yet implemented.")
+    
+    def do_printcsvs(self, args):
+        self.dimacsvs = [os.path.normpath(f"{self.batch_path}/{i}") for i in os.listdir(self.batch_path) if "extracted_" in i]
+        print(self.dimacsvs)
+    
+    def do_extract(self, args):
+        """ extrat tables from mdb using mdbtools bash script, 
+        deposits them in directory with same name as mdb file + 'extracted_'
+        """
+        subTest()
+
+    def do_localingest(self,args):
+        path_to_csvs = args
+        print(path_to_csvs)
+        # modified batch looper (collects a single tables across all dimas)
+        # 
+
 
     def do_dimatables(self, args):
         """ returns all tables contained across all the dimas inside the dimas

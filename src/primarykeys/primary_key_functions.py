@@ -4,6 +4,7 @@ import pandas as pd
 import re
 import logging
 from datetime import datetime, timedelta
+import os, os.path
 
 """
 Primary key strategy:
@@ -183,14 +184,30 @@ def form_date_check(dimapath):
     has a formdate field or not.
     """
     obj = dict()
-    arc = arcno(dimapath)
-    for i in arc.actual_list:
-        df = arcno.MakeColumnsView(i,dimapath)
-        if 'FormDate' in df.columns:
-            obj[i] = True
-        else:
-            obj[i] = False
-    return obj
+    
+    if "extracted_" in dimapath:
+        dimapath = os.path.dirname(dimapath)
+        # print(dimapath)
+        for i in os.listdir(dimapath):
+            # print(i)
+            df = pd.read_csv(os.path.join(dimapath,i),engine='python-fwf')
+            # print(df.columns)
+            tbl_columns = [col for col in df.columns]
+            if 'FormDate' in tbl_columns:
+                obj[i] = True
+            else:
+                obj[i] = False
+        return obj
+    else:
+        
+        arc = arcno(dimapath)
+        for i in arc.actual_list:
+            df = arcno.MakeColumnsView(i,dimapath)
+            if 'FormDate' in df.columns:
+                obj[i] = True
+            else:
+                obj[i] = False
+        return obj
 
 
 def date_grp(target_date, formdate_df, window_size):

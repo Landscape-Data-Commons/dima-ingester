@@ -17,6 +17,7 @@ services:
       - ./index.py:/src/src/index.py
       - ./src/utils/new_export.py:/usr/src/src/utils/new_export.py
       - ./src/utils/export.sh:/usr/src/src/utils/export.sh
+      - ./src/primarykeys/primary_key_functions.py:/usr/src/src/primarykeys/primary_key_functions.py
 #     networks:
 #       - pg-network
 # networks:

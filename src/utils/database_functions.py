@@ -207,28 +207,29 @@ class arcno():
 
     @staticmethod
     def MakeTableViewLocal(in_table, index_or_name ):
-        arc =arcno()
-        no_dima_dict = arc.getNoDimaDict()
-        print("chosen index: ", index_or_name)
-        if isinstance(index_or_name, int):
-            dima_csv_path = self.nodimapaths[index_or_name]
-        else:
-            dima_csv_path = self.nodimapaths[index_or_name]
+        return
+        # arc =arcno()
+        # no_dima_dict = arc.getNoDimaDict()
+        # print("chosen index: ", index_or_name)
+        # if isinstance(index_or_name, int):
+        #     dima_csv_path = self.nodimapaths[index_or_name]
+        # else:
+        #     dima_csv_path = self.nodimapaths[index_or_name]
 
-        print("chosen path: ", dima_csv_path)
-        for i in no_dima_dict[index_or_name]:
-            if in_table in i:
-                print("tablepath found")
-                tablepath = i
-                print(tablepath)
-            # else:
-                # print("no tablepath made")
+        # print("chosen path: ", dima_csv_path)
+        # for i in no_dima_dict[index_or_name]:
+        #     if in_table in i:
+        #         print("tablepath found")
+        #         tablepath = i
+        #         print(tablepath)
+        #     # else:
+        #         # print("no tablepath made")
 
-        try: 
+        # try: 
 
-            return LocalTable(tablepath, dima_csv_path).temp
-        except Exception as e:
-            print(e)
+        #     return LocalTable(tablepath, dima_csv_path).temp
+        # except Exception as e:
+        #     print(e)
 
     def clear(self,var):
         if isinstance(var, list):
@@ -430,6 +431,7 @@ class Table:
 
     def temp(self):
         return self.temp
+    
 class LocalTable:
     temp = None
     basepath = r"/usr/src/dimas"
@@ -439,10 +441,8 @@ class LocalTable:
         pathID = basename(self.path).split("extracted_")[1]
         temppath = f"/usr/src/dimas/extracted_{pathID}/"
         truepath = join(temppath, f"{pathID}-{in_table}.csv")
-        print(truepath)
 
-        self.temp = pd.read_csv(truepath)
-        print(self.temp)
+        self.temp = pd.read_csv(truepath, engine='python-fwf')
 
     def temp(self):
         return self.temp
